@@ -81,23 +81,37 @@ export default class AmazonPayPaymentStrategy implements PaymentStrategy {
 
         const { payment: { paymentData, ...paymentPayload }, useStoreCredit = false } = payload;
 
-        return this._store.dispatch(
-            this._remoteCheckoutActionCreator.initializePayment(paymentPayload.methodId, { referenceId, useStoreCredit })
-        )
-            .then(() => this._store.dispatch(
-                this._orderActionCreator.submitOrder({
-                    ...payload,
-                    payment: paymentPayload,
-                }, options)
-            ))
-            .catch(error => {
-                if (error instanceof RequestError && error.body.type === 'provider_widget_error' && this._walletOptions) {
-                    return this._createWallet(this._walletOptions)
-                        .then(() => Promise.reject(error));
-                }
+        if (this._window.OffAmazonPayments && this._window.OffAmazonPayments.initConfirmationFlow) {
+            const sellerId = this._getMerchantId();
+            this._window.OffAmazonPayments.initConfirmationFlow(sellerId, referenceId, (confirmationFlow: any) => {
+                this._store.dispatch(
+                    this._remoteCheckoutActionCreator.initializePayment(paymentPayload.methodId, { referenceId, useStoreCredit })
+                )
+                    .then(
+                        () => this._store.dispatch(
+                            this._orderActionCreator.submitOrder({
+                                ...payload,
+                                payment: paymentPayload,
+                            }, options)
+                        ))
+                    .then(
+                        () => confirmationFlow.success()
+                    )
+                    .catch(error => {
+                        confirmationFlow.error();
+                        if (error instanceof RequestError && error.body.type === 'provider_widget_error' && this._walletOptions) {
+                            return this._createWallet(this._walletOptions)
+                                .then(() => Promise.reject(error));
+                        }
 
-                return Promise.reject(error);
+                        return Promise.reject(error);
+                    });
             });
+            return new Promise<never>(() => {})
+        }
+        return Promise.reject(new NotInitializedError(NotInitializedErrorType.PaymentNotInitialized));
+
+
     }
 
     finalize(options?: PaymentRequestOptions): Promise<InternalCheckoutSelectors> {

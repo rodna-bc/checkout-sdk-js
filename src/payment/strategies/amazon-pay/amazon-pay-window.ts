@@ -13,6 +13,7 @@ export default interface AmazonPayWindow extends Window {
             AddressBook: AmazonPayAddressBookConstructor;
             Wallet: AmazonPayWalletConstructor;
         };
+        initConfirmationFlow?(sellerId: any, id: string, confirmationFlow: object): any;
     };
     onAmazonLoginReady?(): void;
     onAmazonPaymentsReady?(): void;
