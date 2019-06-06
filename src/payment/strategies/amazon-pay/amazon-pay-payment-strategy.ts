@@ -84,14 +84,13 @@ export default class AmazonPayPaymentStrategy implements PaymentStrategy {
         if (this._window.OffAmazonPayments && this._window.OffAmazonPayments.initConfirmationFlow) {
             const sellerId = this._getMerchantId();
             this._window.OffAmazonPayments.initConfirmationFlow(sellerId, referenceId, (confirmationFlow: any) => {
-                this._store.dispatch(
+                return this._store.dispatch(
                     this._remoteCheckoutActionCreator.initializePayment(paymentPayload.methodId, { referenceId, useStoreCredit })
                 )
                     .then(
                         () => this._store.dispatch(
                             this._orderActionCreator.submitOrder({
                                 ...payload,
-                                payment: paymentPayload,
                             }, options)
                         ))
                     .then(
@@ -107,9 +106,10 @@ export default class AmazonPayPaymentStrategy implements PaymentStrategy {
                         return Promise.reject(error);
                     });
             });
-            return new Promise<never>(() => {})
+           // return new Promise<never>(() => {})
         }
-        return Promise.reject(new NotInitializedError(NotInitializedErrorType.PaymentNotInitialized));
+        return new Promise<never>(() => {})
+        //return Promise.reject(new NotInitializedError(NotInitializedErrorType.PaymentNotInitialized));
 
 
     }
