@@ -91,6 +91,7 @@ export default class AmazonPayPaymentStrategy implements PaymentStrategy {
                         () => this._store.dispatch(
                             this._orderActionCreator.submitOrder({
                                 ...payload,
+                                payment: paymentPayload,
                             }, options)
                         ))
                     .then(
