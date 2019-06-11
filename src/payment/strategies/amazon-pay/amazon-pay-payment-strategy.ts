@@ -80,23 +80,16 @@ export default class AmazonPayPaymentStrategy implements PaymentStrategy {
         }
 
         const { payment: { paymentData, ...paymentPayload }, useStoreCredit = false } = payload;
+        const orderPayload = { useStoreCredit: false};
 
         if (this._window.OffAmazonPayments && this._window.OffAmazonPayments.initConfirmationFlow) {
             const sellerId = this._getMerchantId();
             this._window.OffAmazonPayments.initConfirmationFlow(sellerId, referenceId, (confirmationFlow: any) => {
-                return this._store.dispatch(
-                    this._remoteCheckoutActionCreator.initializePayment(paymentPayload.methodId, { referenceId, useStoreCredit })
-                )
-                    .then(
-                        () => this._store.dispatch(
-                            this._orderActionCreator.submitOrder({
-                                ...payload,
-                                payment: paymentPayload,
-                            }, options)
-                        ))
-                    .then(
-                        () => confirmationFlow.success()
-                    )
+                return this._store.dispatch(this._orderActionCreator.submitOrder(orderPayload, options))
+                    .then(() => this._store.dispatch(
+                        this._remoteCheckoutActionCreator.initializePayment(paymentPayload.methodId, { referenceId, useStoreCredit })
+                    ))
+                    .then( () => confirmationFlow.success())
                     .catch(error => {
                         confirmationFlow.error();
                         if (error instanceof RequestError && error.body.type === 'provider_widget_error' && this._walletOptions) {
@@ -106,6 +99,27 @@ export default class AmazonPayPaymentStrategy implements PaymentStrategy {
 
                         return Promise.reject(error);
                     });
+                // return this._store.dispatch(
+                //     this._remoteCheckoutActionCreator.initializePayment(paymentPayload.methodId, { referenceId, useStoreCredit })
+                // )
+                //     .then(
+                //         () => this._store.dispatch(
+                //             this._orderActionCreator.submitOrder({
+                //                 ...payload
+                //             }, options)
+                //         ))
+                //     .then(
+                //         () => confirmationFlow.success()
+                //     )
+                //     .catch(error => {
+                //         confirmationFlow.error();
+                //         if (error instanceof RequestError && error.body.type === 'provider_widget_error' && this._walletOptions) {
+                //             return this._createWallet(this._walletOptions)
+                //                 .then(() => Promise.reject(error));
+                //         }
+                //
+                //         return Promise.reject(error);
+                //     });
             });
            // return new Promise<never>(() => {})
         }
