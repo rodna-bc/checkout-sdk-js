@@ -99,34 +99,10 @@ export default class AmazonPayPaymentStrategy implements PaymentStrategy {
 
                         return Promise.reject(error);
                     });
-                // return this._store.dispatch(
-                //     this._remoteCheckoutActionCreator.initializePayment(paymentPayload.methodId, { referenceId, useStoreCredit })
-                // )
-                //     .then(
-                //         () => this._store.dispatch(
-                //             this._orderActionCreator.submitOrder({
-                //                 ...payload
-                //             }, options)
-                //         ))
-                //     .then(
-                //         () => confirmationFlow.success()
-                //     )
-                //     .catch(error => {
-                //         confirmationFlow.error();
-                //         if (error instanceof RequestError && error.body.type === 'provider_widget_error' && this._walletOptions) {
-                //             return this._createWallet(this._walletOptions)
-                //                 .then(() => Promise.reject(error));
-                //         }
-                //
-                //         return Promise.reject(error);
-                //     });
             });
-           // return new Promise<never>(() => {})
         }
-        return new Promise<never>(() => {})
-        //return Promise.reject(new NotInitializedError(NotInitializedErrorType.PaymentNotInitialized));
 
-
+        return new Promise<never>(() => {});
     }
 
     finalize(options?: PaymentRequestOptions): Promise<InternalCheckoutSelectors> {
