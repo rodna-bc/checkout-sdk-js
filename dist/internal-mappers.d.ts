@@ -550,6 +550,7 @@ declare interface Order {
     taxTotal: number;
     payments?: OrderPayments;
     status: string;
+    providerTransactionId: string;
 }
 
 declare interface OrderMetaState extends InternalOrderMeta {
