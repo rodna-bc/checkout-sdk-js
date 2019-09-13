@@ -87,15 +87,15 @@ export default class AmazonPayPaymentStrategy implements PaymentStrategy {
         const sellerId = this._getMerchantId();
 
         if (!referenceId || !sellerId) {
-            return Promise.reject(new NotInitializedError(NotInitializedErrorType.PaymentNotInitialized));
+            throw new NotInitializedError(NotInitializedErrorType.PaymentNotInitialized);
         }
 
         if (!payload.payment) {
-            return Promise.reject(new InvalidArgumentError('Unable to proceed because "payload.payment.methodId" argument is not provided.'));
+            throw new InvalidArgumentError('Unable to proceed because "payload.payment.methodId" argument is not provided.');
         }
 
         if (!this._isPaymentMethodSelected) {
-            return Promise.reject(new MissingDataError(MissingDataErrorType.MissingPaymentMethod));
+            throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
         }
 
         const { payment: { paymentData, ...paymentPayload }, useStoreCredit = false } = payload;
