@@ -3,13 +3,7 @@ import { includes } from 'lodash';
 import { Address } from '../../../address';
 import { BillingAddress } from '../../../billing';
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
-import {
-    InvalidArgumentError,
-    MissingDataError,
-    MissingDataErrorType,
-    NotInitializedError,
-    NotInitializedErrorType
-} from '../../../common/error/errors';
+import { InvalidArgumentError, MissingDataError, MissingDataErrorType, NotInitializedError, NotInitializedErrorType } from '../../../common/error/errors';
 import { OrderActionCreator, OrderRequestBody } from '../../../order';
 import { OrderFinalizationNotRequiredError } from '../../../order/errors';
 import { RemoteCheckoutActionCreator } from '../../../remote-checkout';
@@ -18,15 +12,10 @@ import PaymentMethodActionCreator from '../../payment-method-action-creator';
 import { PaymentInitializeOptions, PaymentRequestOptions } from '../../payment-request-options';
 import PaymentStrategy from '../payment-strategy';
 
-import KlarnaPayments, {
-    KlarnaAddress,
-    KlarnaAuthorizationResponse,
-    KlarnaLoadResponse,
-    KlarnaUpdateSessionParams
-} from './klarna-payments';
+import KlarnaPayments, { KlarnaAddress, KlarnaAuthorizationResponse, KlarnaLoadResponse, KlarnaUpdateSessionParams } from './klarna-payments';
 import KlarnaV2ScriptLoader from './klarnav2-script-loader';
 
-export default class KlarnaPaymentStrategy implements PaymentStrategy {
+export default class KlarnaV2PaymentStrategy implements PaymentStrategy {
     private _klarnaPayments?: KlarnaPayments;
     private _unsubscribe?: (() => void);
     private _supportedEUCountries = ['AT', 'DE', 'DK', 'FI', 'GB', 'NL', 'NO', 'SE', 'CH'];

@@ -1,14 +1,14 @@
-import {ReadableDataStore} from '@bigcommerce/data-store';
-import {some} from 'lodash';
+import { ReadableDataStore } from '@bigcommerce/data-store';
+import { some } from 'lodash';
 
-import {InternalCheckoutSelectors} from '../checkout';
-import {MissingDataError, MissingDataErrorType} from '../common/error/errors';
-import {Registry, RegistryOptions} from '../common/registry';
+import { InternalCheckoutSelectors } from '../checkout';
+import { MissingDataError, MissingDataErrorType } from '../common/error/errors';
+import { Registry, RegistryOptions } from '../common/registry';
 
 import PaymentMethod from './payment-method';
 import * as paymentMethodTypes from './payment-method-types';
 import PaymentStrategyType from './payment-strategy-type';
-import {PaymentStrategy} from './strategies';
+import { PaymentStrategy } from './strategies';
 
 export default class PaymentStrategyRegistry extends Registry<PaymentStrategy, PaymentStrategyType> {
     constructor(
