@@ -2983,6 +2983,13 @@ declare interface KlarnaLoadResponse {
     };
 }
 
+declare interface KlarnaLoadResponse_2 {
+    show_form: boolean;
+    error?: {
+        invalid_fields: string[];
+    };
+}
+
 /**
  * A set of options that are required to initialize the Klarna payment method.
  *
@@ -3002,6 +3009,27 @@ declare interface KlarnaPaymentInitializeOptions {
      * or not the widget is loaded successfully.
      */
     onLoad?(response: KlarnaLoadResponse): void;
+}
+
+/**
+ * A set of options that are required to initialize the KlarnaV2 payment method.
+ *
+ * When KlarnaV2 is initialized, a list of payment options will be displayed for the customer to choose from.
+ * Each one with its own widget.
+ */
+declare interface KlarnaV2PaymentInitializeOptions {
+    /**
+     * The ID of a container which the payment widget should insert into.
+     */
+    container: string;
+    /**
+     * A callback that gets called when the widget is loaded and ready to be
+     * interacted with.
+     *
+     * @param response - The result of the initialization. It indicates whether
+     * or not the widget is loaded successfully.
+     */
+    onLoad?(response: KlarnaLoadResponse_2): void;
 }
 
 declare interface LabelStyles extends InlineElementStyles {
@@ -3297,6 +3325,11 @@ declare interface PaymentInitializeOptions extends PaymentRequestOptions {
      * They can be omitted unless you need to support Klarna.
      */
     klarna?: KlarnaPaymentInitializeOptions;
+    /**
+     * The options that are required to initialize the KlarnaV2 payment method.
+     * They can be omitted unless you need to support KlarnaV2.
+     */
+    klarnav2?: KlarnaV2PaymentInitializeOptions;
     /**
      * The options that are required to initialize the Masterpass payment method.
      * They can be omitted unless you need to support Masterpass.
