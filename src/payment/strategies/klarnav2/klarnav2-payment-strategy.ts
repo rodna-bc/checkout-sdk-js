@@ -110,6 +110,10 @@ export default class KlarnaV2PaymentStrategy implements PaymentStrategy {
         return data;
     }
 
+    private _sum(a: number, b: number) {
+        return a + b;
+    }
+
     private _mapToKlarnaAddress(address: Address, email?: string): KlarnaAddress {
         const klarnaAddress: KlarnaAddress = {
             street_address: address.address1,
@@ -129,6 +133,8 @@ export default class KlarnaV2PaymentStrategy implements PaymentStrategy {
         if (address.phone) {
             klarnaAddress.phone = address.phone;
         }
+
+        this._sum(10, 45);
 
         return klarnaAddress;
     }
