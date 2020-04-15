@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.59.1-alpha.bc58a81277c7bc5721828ebc1497d9b793f017a1](https://github.com/bigcommerce/checkout-sdk-js/compare/v1.59.0...v1.59.1-alpha.bc58a81277c7bc5721828ebc1497d9b793f017a1) (2020-04-15)
+
+
+### Bug Fixes
+
+* **embedded-checkout:** CHECKOUT-4789 Export createEmbeddedCheckoutMessenger function in embedded-checkout bundle ([d2f9f8c](https://github.com/bigcommerce/checkout-sdk-js/commit/d2f9f8c))
+
+
+### Code Refactoring
+
+* **provider:** INT-2464 rename the method id from amazonmaxo to amazonpay ([bc58a81](https://github.com/bigcommerce/checkout-sdk-js/commit/bc58a81))
+
+
+### Features
+
+* **payment:** INT-2113 Checkout button and customer strategy ([31ef5b8](https://github.com/bigcommerce/checkout-sdk-js/commit/31ef5b8))
+* **payment:** INT-2410 Add stripe account as configuration ([aa39dc0](https://github.com/bigcommerce/checkout-sdk-js/commit/aa39dc0))
+
 ## [1.59.0](https://github.com/bigcommerce/checkout-sdk-js/compare/v1.58.0...v1.59.0) (2020-04-03)
 
 
