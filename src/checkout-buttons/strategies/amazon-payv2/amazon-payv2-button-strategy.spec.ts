@@ -111,11 +111,11 @@ describe('AmazonPayv2ButtonStrategy', () => {
             await strategy.initialize(checkoutButtonOptions);
 
             expect(paymentProcessor.createButton).toHaveBeenCalledWith(
-                '#amazonpayv2CheckoutButton', {
+                '#amazonpayCheckoutButton', {
                     checkoutLanguage: 'en_US',
-                    createCheckoutSession: {url: 'https://store-k1drp8k8.bcapp.dev/remote-checkout/amazonpayv2/payment-session'},
+                    createCheckoutSession: {url: 'https://store-k1drp8k8.bcapp.dev/remote-checkout/amazonpay/payment-session'},
                     ledgerCurrency: 'USD',
-                    merchantId: 'checkout_amazonpayv2',
+                    merchantId: 'checkout_amazonpay',
                     placement: 'Cart',
                     productType: 'PayOnly',
                     region: 'us',

@@ -183,7 +183,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
         beforeEach(() => {
             amazonpayv2InitializeOptions = { container: 'container', signInCustomer };
-            initializeOptions = { methodId: 'amazonpayv2', amazonpayv2: amazonpayv2InitializeOptions };
+            initializeOptions = { methodId: 'amazonpay', amazonpayv2: amazonpayv2InitializeOptions };
         });
 
         it('creates the signin button if no paymentToken is present on initializationData', async () => {
@@ -210,7 +210,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
         it('fails to initialize the strategy if amazonpayv2InitializeOptions invalid are provided ', async () => {
             amazonpayv2InitializeOptions = { container: 'invalid_container', signInCustomer };
-            initializeOptions = { methodId: 'amazonpayv2', amazonpayv2: amazonpayv2InitializeOptions };
+            initializeOptions = { methodId: 'amazonpay', amazonpayv2: amazonpayv2InitializeOptions };
 
             await expect(strategy.initialize(initializeOptions)).rejects.toThrow(InvalidArgumentError);
         });
@@ -309,11 +309,11 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
         beforeEach(async () => {
             amazonpayv2InitializeOptions = { container: 'container', signInCustomer };
-            initializeOptions = { methodId: 'amazonpayv2', amazonpayv2: amazonpayv2InitializeOptions };
+            initializeOptions = { methodId: 'amazonpay', amazonpayv2: amazonpayv2InitializeOptions };
             orderRequestBody = {
                 ...getOrderRequestBody(),
                 payment: {
-                    methodId: 'amazonpayv2',
+                    methodId: 'amazonpay',
                 },
             };
 
@@ -410,7 +410,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
     });
 
     describe('#finalize()', () => {
-        const options = { methodId: 'amazonpayv2' };
+        const options = { methodId: 'amazonpay' };
 
         it('finalizes order if order is created and payment is acknowledged', async () => {
             const state = store.getState();
@@ -482,7 +482,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
         beforeEach(async () => {
             amazonpayv2InitializeOptions = { container: 'container', signInCustomer };
-            initializeOptions = { methodId: 'amazonpayv2', amazonpayv2: amazonpayv2InitializeOptions };
+            initializeOptions = { methodId: 'amazonpay', amazonpayv2: amazonpayv2InitializeOptions };
             await strategy.initialize(initializeOptions);
         });
 
