@@ -24,6 +24,7 @@ import { AdyenV2PaymentStrategy, AdyenV2ScriptLoader } from './strategies/adyenv
 import { AffirmPaymentStrategy, AffirmScriptLoader } from './strategies/affirm';
 import { AfterpayPaymentStrategy, AfterpayScriptLoader } from './strategies/afterpay';
 import { AmazonPayPaymentStrategy, AmazonPayScriptLoader } from './strategies/amazon-pay';
+import { createAmazonPayv2PaymentProcessor, AmazonPayv2PaymentStrategy } from './strategies/amazon-payv2';
 import { BlueSnapV2PaymentStrategy } from './strategies/bluesnapv2';
 import { BoltPaymentStrategy } from './strategies/bolt';
 import { createBraintreePaymentProcessor, createBraintreeVisaCheckoutPaymentProcessor, BraintreeCreditCardPaymentStrategy, BraintreePaypalPaymentStrategy, BraintreeScriptLoader, BraintreeSDKCreator, BraintreeVisaCheckoutPaymentStrategy, VisaCheckoutScriptLoader } from './strategies/braintree';
@@ -148,6 +149,17 @@ export default function createPaymentStrategyRegistry(
                 store,
                 new GooglePayAuthorizeNetInitializer()
             )
+        )
+    );
+
+    registry.register(PaymentStrategyType.AMAZONPAYV2, () =>
+        new AmazonPayv2PaymentStrategy(
+            store,
+            paymentStrategyActionCreator,
+            paymentMethodActionCreator,
+            orderActionCreator,
+            paymentActionCreator,
+            createAmazonPayv2PaymentProcessor(store)
         )
     );
 
