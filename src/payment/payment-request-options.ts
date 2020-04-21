@@ -61,7 +61,7 @@ export interface PaymentInitializeOptions extends PaymentRequestOptions {
      * The options that are required to initialize the Amazon Pay payment
      * method. They can be omitted unless you need to support AmazonPayv2.
      */
-    amazonpayv2?: AmazonPayv2PaymentInitializeOptions;
+    amazonpay?: AmazonPayv2PaymentInitializeOptions;
 
     /**
      * The options that are required to initialize the BlueSnapV2 payment method.
