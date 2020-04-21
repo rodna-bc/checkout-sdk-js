@@ -33,9 +33,9 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
     ) { }
 
     async initialize(options: PaymentInitializeOptions): Promise<InternalCheckoutSelectors> {
-        const { methodId, amazonpayv2 } = options;
+        const { methodId, amazonpay } = options;
 
-        if (!amazonpayv2) {
+        if (!amazonpay) {
             throw new InvalidArgumentError('Unable to proceed because "options.amazonpayv2" argument is not provided.');
         }
 
@@ -53,7 +53,7 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
         const { paymentToken } = paymentMethod.initializationData;
 
         this._methodId = methodId;
-        this._signInCustomer = amazonpayv2.signInCustomer;
+        this._signInCustomer = amazonpay.signInCustomer;
 
         await this._amazonPayv2PaymentProcessor.initialize(this._methodId);
 
@@ -62,7 +62,7 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
             this._bindEditButton('billing', paymentToken);
             this._bindEditButton('method', paymentToken);
         } else {
-            this._walletButton = this._createSignInButton(amazonpayv2.container);
+            this._walletButton = this._createSignInButton(amazonpay.container);
 
         }
 
