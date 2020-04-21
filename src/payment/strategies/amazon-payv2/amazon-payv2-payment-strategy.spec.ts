@@ -183,7 +183,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
         beforeEach(() => {
             amazonpayv2InitializeOptions = { container: 'container', signInCustomer };
-            initializeOptions = { methodId: 'amazonpay', amazonpayv2: amazonpayv2InitializeOptions };
+            initializeOptions = { methodId: 'amazonpay', amazonpay: amazonpayv2InitializeOptions };
         });
 
         it('creates the signin button if no paymentToken is present on initializationData', async () => {
@@ -210,13 +210,13 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
         it('fails to initialize the strategy if amazonpayv2InitializeOptions invalid are provided ', async () => {
             amazonpayv2InitializeOptions = { container: 'invalid_container', signInCustomer };
-            initializeOptions = { methodId: 'amazonpay', amazonpayv2: amazonpayv2InitializeOptions };
+            initializeOptions = { methodId: 'amazonpay', amazonpay: amazonpayv2InitializeOptions };
 
             await expect(strategy.initialize(initializeOptions)).rejects.toThrow(InvalidArgumentError);
         });
 
         it('fails to initialize the strategy if no methodid is supplied', async () => {
-            initializeOptions = { methodId: '', amazonpayv2: amazonpayv2InitializeOptions };
+            initializeOptions = { methodId: '', amazonpay: amazonpayv2InitializeOptions };
 
             await expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
         });
@@ -265,7 +265,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
         });
 
         it('does not initialize the paymentProcessor if no options.amazonpayv2 are provided', () => {
-            initializeOptions.amazonpayv2 = undefined;
+            initializeOptions.amazonpay = undefined;
 
             expect(strategy.initialize(initializeOptions)).rejects.toThrow(InvalidArgumentError);
             expect(amazonPayv2PaymentProcessor.initialize).not.toHaveBeenCalled();
@@ -309,7 +309,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
         beforeEach(async () => {
             amazonpayv2InitializeOptions = { container: 'container', signInCustomer };
-            initializeOptions = { methodId: 'amazonpay', amazonpayv2: amazonpayv2InitializeOptions };
+            initializeOptions = { methodId: 'amazonpay', amazonpay: amazonpayv2InitializeOptions };
             orderRequestBody = {
                 ...getOrderRequestBody(),
                 payment: {
@@ -482,7 +482,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
         beforeEach(async () => {
             amazonpayv2InitializeOptions = { container: 'container', signInCustomer };
-            initializeOptions = { methodId: 'amazonpay', amazonpayv2: amazonpayv2InitializeOptions };
+            initializeOptions = { methodId: 'amazonpay', amazonpay: amazonpayv2InitializeOptions };
             await strategy.initialize(initializeOptions);
         });
 
