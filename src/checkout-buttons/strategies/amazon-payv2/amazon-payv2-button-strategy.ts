@@ -43,7 +43,6 @@ export default class AmazonPayv2ButtonStrategy implements CheckoutButtonStrategy
         const paymentMethod = state.paymentMethods.getPaymentMethod(methodId);
         const cart =  state.cart.getCart();
         let productType = AmazonPayv2PayOptions.PayAndShip;
-        
         const config = state.config.getStoreConfig();
 
         if (!config) {
