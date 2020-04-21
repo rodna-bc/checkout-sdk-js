@@ -88,6 +88,15 @@ describe('AmazonPayv2CustomerStrategy', () => {
             expect(paymentProcessor.createButton).toHaveBeenCalled();
         });
 
+        it('Creates the button and validates if cart contains physical items', async () => {
+            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
+            jest.spyOn(store.getState().cart, 'getCart')
+            .mockReturnValue({...store.getState().cart.getCart(), lineItems: {physicalItems: []}});
+            await strategy.initialize(customerInitializeOptions);
+
+            expect(paymentProcessor.createButton).toHaveBeenCalled();
+        });
+
         it('fails to initialize the strategy if no AmazonPayv2CustomerInitializeOptions is provided ', async () => {
             customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions(Mode.Incomplete);
 

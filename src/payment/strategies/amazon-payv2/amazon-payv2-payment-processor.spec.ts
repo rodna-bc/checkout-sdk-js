@@ -51,6 +51,7 @@ describe('AmazonPayv2PaymentProcessor', () => {
             clientMock = {
                 renderButton: jest.fn(() => Promise.resolve(new HTMLElement())),
                 bindChangeAction: () => null,
+                signout: () => null,
             };
             amazonPayv2SDK.Pay.renderButton = jest.fn(() => clientMock);
 
@@ -86,6 +87,7 @@ describe('AmazonPayv2PaymentProcessor', () => {
             clientMock = {
                 renderButton: jest.fn(() => Promise.resolve()),
                 bindChangeAction: () => null,
+                signout: () => null,
             };
 
             amazonPayv2SDK.Pay = clientMock;
