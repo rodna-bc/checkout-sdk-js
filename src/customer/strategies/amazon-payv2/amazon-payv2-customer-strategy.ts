@@ -1,6 +1,6 @@
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
 import { InvalidArgumentError, MissingDataError, MissingDataErrorType, NotImplementedError } from '../../../common/error/errors';
-import { AmazonPayv2PaymentProcessor, AmazonPayv2Placement } from '../../../payment/strategies/amazon-payv2';
+import { AmazonPayv2PaymentProcessor, AmazonPayv2PayOptions, AmazonPayv2Placement } from '../../../payment/strategies/amazon-payv2';
 import { RemoteCheckoutActionCreator } from '../../../remote-checkout';
 import { CustomerInitializeOptions, CustomerRequestOptions } from '../../customer-request-options';
 import CustomerStrategy from '../customer-strategy';
@@ -66,12 +66,18 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
         const state = this._store.getState();
         const paymentMethod = state.paymentMethods.getPaymentMethod(methodId);
         const config = state.config.getStoreConfig();
+        const cart =  state.cart.getCart();
+        let productType = AmazonPayv2PayOptions.PayAndShip;
         if (!config) {
             throw new MissingDataError(MissingDataErrorType.MissingCheckoutConfig);
         }
 
         if (!paymentMethod) {
             throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
+        }
+
+        if (cart && !cart.lineItems.physicalItems.length) {
+            productType = AmazonPayv2PayOptions.PayOnly;
         }
 
         const {
@@ -98,7 +104,7 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
             checkoutLanguage,
             ledgerCurrency,
             region,
-            productType: 'PayAndShip',
+            productType,
             createCheckoutSession: {
                 method: checkoutSessionMethod,
                 url: `${config.storeProfile.shopPath}/remote-checkout/${methodId}/payment-session`,
