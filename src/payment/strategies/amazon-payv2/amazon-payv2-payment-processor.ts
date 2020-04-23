@@ -46,6 +46,21 @@ export default class AmazonPayv2PaymentProcessor {
         return this._amazonPayv2SDK.Pay.renderButton(containerId, params);
     }
 
+    signout(methodId: string): Promise<void> {
+        this._methodId = methodId;
+
+        if (!this._amazonPayv2SDK) {
+            this._configureWallet()
+                .then(() => {
+                    return this.signout(methodId);
+                });
+        } else {
+            this._amazonPayv2SDK.Pay.signout();
+        }
+
+        return Promise.resolve();
+    }
+
     private async _configureWallet(): Promise<void> {
         const methodId = this._getMethodId();
         const state = await this._store.dispatch(this._paymentMethodActionCreator.loadPaymentMethod(methodId));
