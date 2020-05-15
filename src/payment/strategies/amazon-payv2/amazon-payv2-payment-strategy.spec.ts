@@ -247,7 +247,6 @@ describe('AmazonPayv2PaymentStrategy', () => {
             expect(amazonPayv2PaymentProcessor.createButton).not.toHaveBeenCalled();
             expect(amazonPayv2PaymentProcessor.initialize).toHaveBeenCalledWith(paymentMethodMock.id);
             expect(amazonPayv2PaymentProcessor.bindButton).toHaveBeenCalledWith(`#${shippingId}`, paymentToken);
-            expect(amazonPayv2PaymentProcessor.bindButton).toHaveBeenCalledWith(`#${billingId}`, paymentToken);
         });
 
         it('dispatches widgetInteraction when clicking previously binded buttons', async () => {
