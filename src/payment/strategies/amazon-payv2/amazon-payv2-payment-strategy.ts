@@ -81,7 +81,7 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
         const { paymentToken } = paymentMethod.initializationData;
 
         if (paymentToken) {
-            const {payment,  ...order } = payload;
+            const { payment } = payload;
             const paymentData =  { nonce: paymentToken };
 
             if (!payment) {
@@ -89,9 +89,9 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
             }
 
             try {
-                await this._store.dispatch(this._orderActionCreator.submitOrder(order, options));
+                await this._store.dispatch(this._orderActionCreator.submitOrder(payload, options));
 
-                return await this._store.dispatch(this._paymentActionCreator.submitPayment({...payment, paymentData}));
+                return await this._store.dispatch(this._paymentActionCreator.submitPayment({ ...payment, paymentData }));
 
             } catch (error) {
                 if (!(error instanceof RequestError) || !some(error.body.errors, { code: 'three_d_secure_required' })) {

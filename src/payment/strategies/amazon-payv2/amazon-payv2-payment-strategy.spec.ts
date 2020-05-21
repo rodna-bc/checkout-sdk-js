@@ -331,7 +331,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
             await strategy.execute(orderRequestBody, initializeOptions);
 
-            expect(orderActionCreator.submitOrder).toHaveBeenCalledWith(omit(orderRequestBody, 'payment'), initializeOptions);
+            expect(orderActionCreator.submitOrder).toHaveBeenCalledWith(orderRequestBody, initializeOptions);
         });
 
         it('fails to execute if strategy is not initialized', () => {
