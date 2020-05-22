@@ -3,7 +3,7 @@ import { createRequestSender, RequestSender } from '@bigcommerce/request-sender'
 
 import { createCheckoutStore, CheckoutStore } from '../../../checkout';
 import { getCheckoutStoreState } from '../../../checkout/checkouts.mock';
-import { InvalidArgumentError, MissingDataError } from '../../../common/error/errors';
+import { MissingDataError } from '../../../common/error/errors';
 import { PaymentMethod, PaymentMethodActionCreator, PaymentMethodRequestSender } from '../../../payment';
 import { getAmazonPayv2 } from '../../../payment/payment-methods.mock';
 import { createAmazonPayv2PaymentProcessor, AmazonPayv2PaymentProcessor } from '../../../payment/strategies/amazon-payv2';
@@ -123,12 +123,6 @@ describe('AmazonPayv2ShippingStrategy', () => {
             await expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
         });
 
-        it('fails to initialize the strategy if no methodid is supplied', async () => {
-            initializeOptions = { methodId: '' };
-
-            await expect(strategy.initialize(initializeOptions)).rejects.toThrow(InvalidArgumentError);
-        });
-
         it('binds edit buttons if paymentToken is present on initializationData', async () => {
             paymentMethodMock.initializationData.paymentToken = paymentToken;
 
@@ -142,7 +136,7 @@ describe('AmazonPayv2ShippingStrategy', () => {
         it('does not initialize the paymentProcessor if no options.methodId are provided', () => {
             initializeOptions.methodId = '';
 
-            expect(strategy.initialize(initializeOptions)).rejects.toThrow(InvalidArgumentError);
+            expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
             expect(amazonPayv2PaymentProcessor.initialize).not.toHaveBeenCalled();
         });
 

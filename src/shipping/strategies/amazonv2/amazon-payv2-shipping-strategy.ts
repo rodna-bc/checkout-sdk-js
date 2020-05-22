@@ -1,7 +1,7 @@
 import { createAction } from '@bigcommerce/data-store';
 
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
-import { InvalidArgumentError, MissingDataError, MissingDataErrorType } from '../../../common/error/errors';
+import { MissingDataError, MissingDataErrorType } from '../../../common/error/errors';
 import { PaymentMethod, PaymentMethodActionCreator } from '../../../payment';
 import { AmazonPayv2PaymentProcessor } from '../../../payment/strategies/amazon-payv2';
 import { ShippingInitializeOptions } from '../../shipping-request-options';
@@ -29,7 +29,7 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
         const { methodId } = options;
 
         if (!methodId) {
-            throw new InvalidArgumentError('Unable to proceed because "options.amazonv2" argument is not provided.');
+            throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
         }
 
         const state = await this._store.dispatch(this._paymentMethodActionCreator.loadPaymentMethod(methodId));
@@ -39,9 +39,9 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
             throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
         }
 
-        const { paymentToken } = this._paymentMethod.initializationData;
-
         await this._amazonPayv2PaymentProcessor.initialize(methodId);
+
+        const { paymentToken } = this._paymentMethod.initializationData;
 
         if (paymentToken) {
             this._bindEditButton('ship', paymentToken);

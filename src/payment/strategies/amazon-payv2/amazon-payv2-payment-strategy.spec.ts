@@ -8,7 +8,7 @@ import { of, Observable } from 'rxjs';
 
 import { createCheckoutStore, CheckoutRequestSender, CheckoutStore, CheckoutValidator } from '../../../checkout';
 import { getCheckoutStoreState } from '../../../checkout/checkouts.mock';
-import { InvalidArgumentError, MissingDataError, RequestError } from '../../../common/error/errors';
+import { InvalidArgumentError, MissingDataError, NotInitializedError, RequestError } from '../../../common/error/errors';
 import { getResponse } from '../../../common/http-request/responses.mock';
 import { FinalizeOrderAction, OrderActionCreator, OrderActionType, OrderRequestBody, OrderRequestSender, SubmitOrderAction } from '../../../order';
 import { OrderFinalizationNotRequiredError } from '../../../order/errors';
@@ -215,7 +215,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
         });
 
         it('fails to initialize the strategy if no methodid is supplied', async () => {
-            initializeOptions = { methodId: '', amazonpay: amazonpayv2InitializeOptions };
+            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(undefined);
 
             await expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
         });
@@ -229,12 +229,11 @@ describe('AmazonPayv2PaymentStrategy', () => {
         it('fails initialize the strategy if merchantId is not supplied', async () => {
             jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getPaymentMethodMockUndefinedMerchant());
 
-            await expect(strategy.initialize(initializeOptions)).rejects.toThrow(InvalidArgumentError);
+            await expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
         });
 
         it('fails to create signInButton  if get Payment method fails', async () => {
             jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(undefined);
-            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod') .mockReturnValueOnce(paymentMethodMock);
 
             await expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
         });
@@ -269,18 +268,12 @@ describe('AmazonPayv2PaymentStrategy', () => {
             expect(amazonPayv2PaymentProcessor.initialize).not.toHaveBeenCalled();
         });
 
-        it('does not initialize the paymentProcessor if no options.methodId are provided', () => {
-            initializeOptions.methodId = '';
-
-            expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
-            expect(amazonPayv2PaymentProcessor.initialize).not.toHaveBeenCalled();
-        });
-
-        it('does not initialize the paymentProcessor if payment method is missing', () => {
+        it('does not initialize the paymentProcessor if payment method is missing', async () => {
             jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod')
                 .mockReturnValue(undefined);
 
-            expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
+            await expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
+
             expect(amazonPayv2PaymentProcessor.initialize).not.toHaveBeenCalled();
         });
 
@@ -335,7 +328,8 @@ describe('AmazonPayv2PaymentStrategy', () => {
         });
 
         it('fails to execute if strategy is not initialized', () => {
-            strategy = new AmazonPayv2PaymentStrategy(store,
+            strategy = new AmazonPayv2PaymentStrategy(
+                store,
                 paymentStrategyActionCreator,
                 paymentMethodActionCreator,
                 orderActionCreator,
@@ -343,8 +337,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
                 amazonPayv2PaymentProcessor
             );
 
-            expect(strategy.execute(orderRequestBody, initializeOptions)).rejects.toThrow(MissingDataError);
-
+            return expect(strategy.execute(orderRequestBody, initializeOptions)).rejects.toThrow(NotInitializedError);
         });
 
         it('fails to execute if payment method is not found', () => {
@@ -398,8 +391,9 @@ describe('AmazonPayv2PaymentStrategy', () => {
             paymentMethodMock.initializationData.paymentToken = paymentToken;
 
             await strategy.initialize(initializeOptions);
-            strategy.execute(orderRequestBody, initializeOptions);
+            await expect(strategy.execute(orderRequestBody, initializeOptions)).rejects.toThrow(response);
 
+            await new Promise(resolve => process.nextTick(resolve));
             expect(window.location.replace).not.toBeCalledWith('http://some-url');
         });
     });

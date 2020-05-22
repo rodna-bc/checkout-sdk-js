@@ -93,7 +93,7 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
         const state = this._store.getState();
         const paymentMethod = state.paymentMethods.getPaymentMethod(methodId);
         const config = state.config.getStoreConfig();
-        const cart =  state.cart.getCart();
+        const cart = state.cart.getCart();
         let productType = AmazonPayv2PayOptions.PayAndShip;
         if (!config) {
             throw new MissingDataError(MissingDataErrorType.MissingCheckoutConfig);
@@ -103,7 +103,7 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
             throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
         }
 
-        if (cart && !cart.lineItems.physicalItems.length) {
+        if (cart && cart.lineItems.physicalItems.length === 0) {
             productType = AmazonPayv2PayOptions.PayOnly;
         }
 

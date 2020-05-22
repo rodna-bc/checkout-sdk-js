@@ -71,7 +71,7 @@ describe('AmazonPayv2CustomerStrategy', () => {
             .mockReturnValue(Promise.resolve());
 
         jest.spyOn(paymentProcessor, 'signout')
-        .mockReturnValue(Promise.resolve());
+            .mockReturnValue(Promise.resolve());
 
         jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod')
             .mockReturnValue(paymentMethod);
@@ -105,7 +105,7 @@ describe('AmazonPayv2CustomerStrategy', () => {
         it('Creates the button and validates if cart contains physical items', async () => {
             customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
             jest.spyOn(store.getState().cart, 'getCart')
-            .mockReturnValue({...store.getState().cart.getCart(), lineItems: {physicalItems: []}});
+                .mockReturnValue({...store.getState().cart.getCart(), lineItems: {physicalItems: []}});
             await strategy.initialize(customerInitializeOptions);
 
             expect(paymentProcessor.createButton).toHaveBeenCalled();
