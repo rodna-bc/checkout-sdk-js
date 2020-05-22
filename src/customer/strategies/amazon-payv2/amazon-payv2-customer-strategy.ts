@@ -1,12 +1,8 @@
-import { FormPoster } from '@bigcommerce/form-poster';
-import { noop } from 'lodash';
-
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
 import { InvalidArgumentError, MissingDataError, MissingDataErrorType, NotImplementedError } from '../../../common/error/errors';
 import { AmazonPayv2PaymentProcessor, AmazonPayv2PayOptions, AmazonPayv2Placement } from '../../../payment/strategies/amazon-payv2';
 import { RemoteCheckoutActionCreator } from '../../../remote-checkout';
 import { CustomerInitializeOptions, CustomerRequestOptions } from '../../customer-request-options';
-import CustomerStrategyActionCreator from '../../customer-strategy-action-creator';
 import CustomerStrategy from '../customer-strategy';
 
 export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
@@ -15,9 +11,7 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
     constructor(
         private _store: CheckoutStore,
         private _remoteCheckoutActionCreator: RemoteCheckoutActionCreator,
-        private _amazonPayv2PaymentProcessor: AmazonPayv2PaymentProcessor,
-        private _customerStrategyActionCreator: CustomerStrategyActionCreator,
-        private _formPoster: FormPoster
+        private _amazonPayv2PaymentProcessor: AmazonPayv2PaymentProcessor
     ) {}
 
     async initialize(options: CustomerInitializeOptions): Promise<InternalCheckoutSelectors> {
@@ -59,28 +53,10 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
         }
 
         await this._amazonPayv2PaymentProcessor.signout(payment.providerId);
-        await this._store.dispatch(this._remoteCheckoutActionCreator.signOut(payment.providerId, options));
 
-        this._reloadPage();
-
-        return this._store.getState();
-    }
-
-    private _reloadPage(): Promise<InternalCheckoutSelectors> {
-        return this._store.dispatch(this._customerStrategyActionCreator.widgetInteraction(() => {
-            return this._postForm();
-        }), { queueId: 'widgetInteraction' });
-    }
-
-    private _postForm(): Promise<never> {
-        this._formPoster.postForm('/checkout.php', {
-            headers: {
-                Accept: 'text/html',
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-        });
-
-        return new Promise(noop);
+        return this._store.dispatch(
+            this._remoteCheckoutActionCreator.signOut(payment.providerId, options)
+        );
     }
 
     private _createSignInButton(containerId: string, methodId: string): HTMLElement {
