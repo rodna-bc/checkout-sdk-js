@@ -35,7 +35,7 @@ export default class AmazonPayv2PaymentProcessor {
         this._amazonPayv2SDK.Pay.bindChangeAction(buttonId, {
             amazonCheckoutSessionId: sessionId,
             changeAction: 'changeAddress',
-          });
+        });
     }
 
     createButton(containerId: string, params: AmazonPayv2ButtonParams): HTMLElement {

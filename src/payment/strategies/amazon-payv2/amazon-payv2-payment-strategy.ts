@@ -93,12 +93,12 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
             try {
                 return await this._store.dispatch(this._paymentActionCreator.submitPayment(paymentPayload));
             } catch (error) {
-                if (!(error instanceof RequestError) || !some(error.body.errors, { code: 'three_d_secure_required' })) {
+                if (!(error instanceof RequestError) || !some(error.body.errors, { code: 'additional_action_required' })) {
                     return Promise.reject(error);
                 }
 
                 return new Promise(() => {
-                    window.location.replace(error.body.three_ds_result.acs_url);
+                    window.location.replace(error.body.provider_data.redirect_url);
                 });
             }
         }

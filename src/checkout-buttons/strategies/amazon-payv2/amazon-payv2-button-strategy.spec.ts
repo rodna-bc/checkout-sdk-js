@@ -108,6 +108,7 @@ describe('AmazonPayv2ButtonStrategy', () => {
             checkoutButtonOptions = getAmazonPayv2CheckoutButtonOptions();
             jest.spyOn(store.getState().cart, 'getCart')
                 .mockReturnValue({...store.getState().cart.getCart(), lineItems : {physicalItems: []}});
+
             await strategy.initialize(checkoutButtonOptions);
 
             expect(paymentProcessor.createButton).toHaveBeenCalledWith(

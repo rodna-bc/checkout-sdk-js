@@ -201,7 +201,8 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
         it('initialize the strategy and validates if cart contains physical items', async () => {
             jest.spyOn(store.getState().cart, 'getCart')
-            .mockReturnValue({...store.getState().cart.getCart(), lineItems: {physicalItems: []}});
+                .mockReturnValue({...store.getState().cart.getCart(), lineItems: {physicalItems: []}});
+
             await strategy.initialize(initializeOptions);
 
             expect(amazonPayv2PaymentProcessor.createButton).toHaveBeenCalled();
@@ -321,7 +322,6 @@ describe('AmazonPayv2PaymentStrategy', () => {
             paymentMethodMock.initializationData.paymentToken = paymentToken;
 
             await strategy.initialize(initializeOptions);
-
             await strategy.execute(orderRequestBody, initializeOptions);
 
             expect(orderActionCreator.submitOrder).toHaveBeenCalledWith(orderRequestBody, initializeOptions);
@@ -360,10 +360,10 @@ describe('AmazonPayv2PaymentStrategy', () => {
             const error = new RequestError(getResponse({
                 ...getErrorPaymentResponseBody(),
                 errors: [
-                    { code: 'three_d_secure_required' },
+                    { code: 'additional_action_required' },
                 ],
-                three_ds_result: {
-                    acs_url: 'http://some-url',
+                provider_data: {
+                    redirect_url: 'http://some-url',
                 },
                 status: 'error',
             }));
@@ -376,8 +376,8 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
             await strategy.initialize(initializeOptions);
             strategy.execute(orderRequestBody, initializeOptions);
-
             await new Promise(resolve => process.nextTick(resolve));
+
             expect(window.location.replace).toBeCalledWith('http://some-url');
         });
 
@@ -392,8 +392,8 @@ describe('AmazonPayv2PaymentStrategy', () => {
 
             await strategy.initialize(initializeOptions);
             await expect(strategy.execute(orderRequestBody, initializeOptions)).rejects.toThrow(response);
-
             await new Promise(resolve => process.nextTick(resolve));
+
             expect(window.location.replace).not.toBeCalledWith('http://some-url');
         });
     });
