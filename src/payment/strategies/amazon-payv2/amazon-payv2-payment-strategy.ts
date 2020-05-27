@@ -51,7 +51,6 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
         const { paymentToken } = paymentMethod.initializationData;
 
         if (paymentToken) {
-            this._bindEditButton('shipping', paymentToken);
             this._bindEditButton('method', paymentToken);
         } else {
             this._walletButton = this._createSignInButton(amazonpay.container, paymentMethod);

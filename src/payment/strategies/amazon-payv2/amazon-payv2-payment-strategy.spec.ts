@@ -37,8 +37,7 @@ import createAmazonPayv2PaymentProcessor from './create-amazon-payv2-payment-pro
 describe('AmazonPayv2PaymentStrategy', () => {
     let amazonPayv2PaymentProcessor: AmazonPayv2PaymentProcessor;
     let container: HTMLDivElement;
-    let editBillingButton: HTMLDivElement;
-    let editShippingButton: HTMLDivElement;
+    let editMethodButton: HTMLDivElement;
     let finalizeOrderAction: Observable<FinalizeOrderAction>;
     let formPoster: FormPoster;
     let orderActionCreator: OrderActionCreator;
@@ -93,13 +92,10 @@ describe('AmazonPayv2PaymentStrategy', () => {
         container.setAttribute('id', 'container');
         document.body.appendChild(container);
 
-        editShippingButton = document.createElement('div');
-        editShippingButton.setAttribute('id', 'edit-shipping-address-button');
-        document.body.appendChild(editShippingButton);
+        editMethodButton = document.createElement('div');
+        editMethodButton.setAttribute('id', 'edit-method-address-button');
+        document.body.appendChild(editMethodButton);
 
-        editBillingButton = document.createElement('div');
-        editBillingButton.setAttribute('id', 'edit-billing-address-button');
-        document.body.appendChild(editBillingButton);
         finalizeOrderAction = of(createAction(OrderActionType.FinalizeOrderRequested));
         submitPaymentAction = of(createAction(PaymentActionType.SubmitPaymentRequested));
 
@@ -150,21 +146,12 @@ describe('AmazonPayv2PaymentStrategy', () => {
     afterEach(() => {
         document.body.removeChild(container);
 
-        if (editShippingButton.parentElement === document.body) {
-            document.body.removeChild(editShippingButton);
+        if (editMethodButton.parentElement === document.body) {
+            document.body.removeChild(editMethodButton);
         } else {
-            const shippingButton = document.getElementById('edit-shipping-address-button');
+            const shippingButton = document.getElementById('edit-method-address-button');
             if (shippingButton) {
                 document.body.removeChild(shippingButton);
-            }
-        }
-
-        if (editShippingButton.parentElement === document.body) {
-            document.body.removeChild(editBillingButton);
-        } else {
-            const billingButton = document.getElementById('edit-billing-address-button');
-            if (billingButton) {
-                document.body.removeChild(billingButton);
             }
         }
     });
@@ -177,8 +164,7 @@ describe('AmazonPayv2PaymentStrategy', () => {
         let amazonpayv2InitializeOptions: AmazonPayv2PaymentInitializeOptions;
         let initializeOptions: PaymentInitializeOptions;
         const paymentToken = 'abc123';
-        const billingId = 'edit-billing-address-button';
-        const shippingId = 'edit-shipping-address-button';
+        const changeMethodId = 'edit-method-address-button';
 
         beforeEach(() => {
             amazonpayv2InitializeOptions = { container: 'container', signInCustomer };
@@ -239,22 +225,23 @@ describe('AmazonPayv2PaymentStrategy', () => {
             await expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
         });
 
-        it('binds edit buttons if paymentToken is present on initializationData', async () => {
+        it('binds edit method button if paymentToken is present on initializationData', async () => {
             paymentMethodMock.initializationData.paymentToken = paymentToken;
 
             await strategy.initialize(initializeOptions);
 
-            expect(amazonPayv2PaymentProcessor.createButton).not.toHaveBeenCalled();
             expect(amazonPayv2PaymentProcessor.initialize).toHaveBeenCalledWith(paymentMethodMock.id);
-            expect(amazonPayv2PaymentProcessor.bindButton).toHaveBeenCalledWith(`#${shippingId}`, paymentToken);
+            expect(amazonPayv2PaymentProcessor.bindButton).toHaveBeenCalledWith(`#${changeMethodId}`, paymentToken);
+            expect(amazonPayv2PaymentProcessor.createButton).not.toHaveBeenCalled();
         });
 
-        it('dispatches widgetInteraction when clicking previously binded buttons', async () => {
+        it('dispatches widgetInteraction when clicking previously binded edit method button', async () => {
             paymentMethodMock.initializationData.paymentToken = paymentToken;
 
             await strategy.initialize(initializeOptions);
 
-            const editButton = document.getElementById(shippingId);
+            const editButton = document.getElementById(changeMethodId);
+
             if (editButton) {
                 editButton.click();
             }
@@ -278,18 +265,17 @@ describe('AmazonPayv2PaymentStrategy', () => {
             expect(amazonPayv2PaymentProcessor.initialize).not.toHaveBeenCalled();
         });
 
-        it('does not bind edit billing address button if button do not exist', async () => {
-            document.body.removeChild(editBillingButton);
+        it('does not bind edit method button if button do not exist', async () => {
+            document.body.removeChild(editMethodButton);
             paymentMethodMock.initializationData.paymentToken = paymentToken;
 
             await strategy.initialize(initializeOptions);
 
-            expect(amazonPayv2PaymentProcessor.createButton).not.toHaveBeenCalled();
             expect(amazonPayv2PaymentProcessor.initialize).toHaveBeenCalledWith(paymentMethodMock.id);
-            expect(amazonPayv2PaymentProcessor.bindButton).toHaveBeenCalledWith(`#${shippingId}`, paymentToken);
-            expect(amazonPayv2PaymentProcessor.bindButton).not.toHaveBeenCalledWith(`#${billingId}`, paymentToken);
+            expect(amazonPayv2PaymentProcessor.bindButton).not.toHaveBeenCalled();
+            expect(amazonPayv2PaymentProcessor.createButton).not.toHaveBeenCalled();
 
-            document.body.appendChild(editShippingButton);
+            document.body.appendChild(editMethodButton);
         });
     });
 
