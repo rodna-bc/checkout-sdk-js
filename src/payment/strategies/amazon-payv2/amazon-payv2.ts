@@ -34,12 +34,12 @@ export interface AmazonPayv2CheckoutSession {
     extractAmazonCheckoutSessionId?: string;
 }
 
+export type AmazonPayV2ChangeActionType = 'changeAddress' | 'changePayment';
+
 export interface AmazonPayv2ChangeActionOptions {
     amazonCheckoutSessionId: string;
-    changeAction: string;
+    changeAction: AmazonPayV2ChangeActionType;
 }
-
-export type EditableAddressType = 'billing' | 'shipping' | 'method';
 
 export enum AmazonPayv2Regions {
     de = 'eu',

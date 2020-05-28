@@ -1,5 +1,3 @@
-import { StandardError } from '../../../common/error/errors';
-
 /**
  * A set of options that are required to initialize the shipping step of
  * checkout in order to support Amazon Pay.
@@ -9,9 +7,9 @@ import { StandardError } from '../../../common/error/errors';
  */
 export default interface AmazonPayv2ShippingInitializeOptions {
     /**
-     * The ID of a container which the address widget should insert into.
+     * This walletButton is used to set an event listener, provide an element ID if you want
+     * users to be able to select a different shipping address by clicking on a button.
+     * It should be an HTML element.
      */
-    container?: string;
-
-    onError?(error: StandardError): void;
+    walletButton?: string;
 }

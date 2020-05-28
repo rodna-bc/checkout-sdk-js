@@ -37,6 +37,7 @@ export default function createShippingStrategyRegistry(
     registry.register('amazonpay', () =>
         new AmazonPayv2ShippingStrategy(
             store,
+            consignmentActionCreator,
             new PaymentMethodActionCreator(new PaymentMethodRequestSender(requestSender)),
             createAmazonPayv2PaymentProcessor(store)
         )

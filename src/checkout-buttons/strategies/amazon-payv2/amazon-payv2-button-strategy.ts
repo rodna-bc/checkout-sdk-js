@@ -42,7 +42,6 @@ export default class AmazonPayv2ButtonStrategy implements CheckoutButtonStrategy
         const state = this._store.getState();
         const paymentMethod = state.paymentMethods.getPaymentMethod(methodId);
         const cart = state.cart.getCart();
-        let productType = AmazonPayv2PayOptions.PayAndShip;
         const config = state.config.getStoreConfig();
 
         if (!config) {
@@ -71,17 +70,15 @@ export default class AmazonPayv2ButtonStrategy implements CheckoutButtonStrategy
             throw new InvalidArgumentError();
         }
 
-        if (cart && cart.lineItems.physicalItems.length === 0) {
-            productType = AmazonPayv2PayOptions.PayOnly;
-        }
-
         const amazonButtonOptions = {
             merchantId,
             sandbox: !!testMode,
             checkoutLanguage,
             ledgerCurrency,
             region,
-            productType,
+            productType: cart && cart.lineItems.physicalItems.length === 0 ?
+                AmazonPayv2PayOptions.PayOnly :
+                AmazonPayv2PayOptions.PayAndShip,
             createCheckoutSession: {
                 method: checkoutSessionMethod,
                 url: `${config.storeProfile.shopPath}/remote-checkout/${methodId}/payment-session`,

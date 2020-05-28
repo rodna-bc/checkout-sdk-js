@@ -2,7 +2,7 @@ import { CheckoutStore } from '../../../checkout';
 import { MissingDataError, MissingDataErrorType, NotInitializedError, NotInitializedErrorType } from '../../../common/error/errors';
 import PaymentMethodActionCreator from '../../payment-method-action-creator';
 
-import { AmazonPayv2ButtonParams, AmazonPayv2SDK } from './amazon-payv2';
+import { AmazonPayv2ButtonParams, AmazonPayv2SDK, AmazonPayV2ChangeActionType } from './amazon-payv2';
 import AmazonPayv2ScriptLoader from './amazon-payv2-script-loader';
 
 export default class AmazonPayv2PaymentProcessor {
@@ -27,14 +27,14 @@ export default class AmazonPayv2PaymentProcessor {
         return Promise.resolve();
     }
 
-    bindButton(buttonId: string, sessionId: string): void {
+    bindButton(buttonId: string, sessionId: string, changeAction: AmazonPayV2ChangeActionType): void {
         if (!this._amazonPayv2SDK) {
             throw new NotInitializedError(NotInitializedErrorType.PaymentNotInitialized);
         }
 
-        this._amazonPayv2SDK.Pay.bindChangeAction(buttonId, {
+        this._amazonPayv2SDK.Pay.bindChangeAction(`#${buttonId}`, {
             amazonCheckoutSessionId: sessionId,
-            changeAction: 'changeAddress',
+            changeAction,
         });
     }
 

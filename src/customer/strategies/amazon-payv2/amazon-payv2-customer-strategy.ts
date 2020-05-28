@@ -70,17 +70,13 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
         const paymentMethod = state.paymentMethods.getPaymentMethod(methodId);
         const config = state.config.getStoreConfig();
         const cart = state.cart.getCart();
-        let productType = AmazonPayv2PayOptions.PayAndShip;
+
         if (!config) {
             throw new MissingDataError(MissingDataErrorType.MissingCheckoutConfig);
         }
 
         if (!paymentMethod) {
             throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
-        }
-
-        if (cart && cart.lineItems.physicalItems.length === 0) {
-            productType = AmazonPayv2PayOptions.PayOnly;
         }
 
         const {
@@ -107,7 +103,9 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
             checkoutLanguage,
             ledgerCurrency,
             region,
-            productType,
+            productType: cart && cart.lineItems.physicalItems.length === 0 ?
+                AmazonPayv2PayOptions.PayOnly :
+                AmazonPayv2PayOptions.PayAndShip,
             createCheckoutSession: {
                 method: checkoutSessionMethod,
                 url: `${config.storeProfile.shopPath}/remote-checkout/${methodId}/payment-session`,

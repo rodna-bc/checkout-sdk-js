@@ -1,12 +1,16 @@
+import { createAction } from '@bigcommerce/data-store';
 import { createFormPoster, FormPoster } from '@bigcommerce/form-poster';
 import { createRequestSender, RequestSender } from '@bigcommerce/request-sender';
+import { of } from 'rxjs';
 
-import { createCheckoutStore, CheckoutStore } from '../../../checkout';
+import { ConsignmentActionCreator, ConsignmentActionType, ConsignmentRequestSender } from '../..';
+import { createCheckoutStore, CheckoutRequestSender, CheckoutStore } from '../../../checkout';
 import { getCheckoutStoreState } from '../../../checkout/checkouts.mock';
-import { MissingDataError } from '../../../common/error/errors';
+import { InvalidArgumentError, MissingDataError } from '../../../common/error/errors';
 import { PaymentMethod, PaymentMethodActionCreator, PaymentMethodRequestSender } from '../../../payment';
 import { getAmazonPayv2 } from '../../../payment/payment-methods.mock';
 import { createAmazonPayv2PaymentProcessor, AmazonPayv2PaymentProcessor } from '../../../payment/strategies/amazon-payv2';
+import { getFlatRateOption } from '../../internal-shipping-options.mock';
 import { ShippingInitializeOptions } from '../../shipping-request-options';
 
 import AmazonPayv2ShippingStrategy from './amazon-payv2-shipping-strategy';
@@ -20,10 +24,15 @@ describe('AmazonPayv2ShippingStrategy', () => {
     let paymentMethodMock: PaymentMethod;
     let requestSender: RequestSender;
     let store: CheckoutStore;
+    let consignmentActionCreator: ConsignmentActionCreator;
     let strategy: AmazonPayv2ShippingStrategy;
 
     beforeEach(() => {
         store = createCheckoutStore(getCheckoutStoreState());
+        consignmentActionCreator = new ConsignmentActionCreator(
+            new ConsignmentRequestSender(createRequestSender()),
+            new CheckoutRequestSender(createRequestSender())
+        );
         amazonPayv2PaymentProcessor = createAmazonPayv2PaymentProcessor(store);
         requestSender = createRequestSender();
         formPoster = createFormPoster();
@@ -65,6 +74,7 @@ describe('AmazonPayv2ShippingStrategy', () => {
 
         strategy = new AmazonPayv2ShippingStrategy(
             store,
+            consignmentActionCreator,
             paymentMethodActionCreator,
             amazonPayv2PaymentProcessor
         );
@@ -92,7 +102,12 @@ describe('AmazonPayv2ShippingStrategy', () => {
         const shippingId = 'edit-ship-address-button';
 
         beforeEach(() => {
-            initializeOptions = { methodId: 'amazonpay' };
+            initializeOptions = {
+                methodId: 'amazonpay',
+                amazonpay: {
+                    walletButton: shippingId,
+                },
+            };
         });
 
         it('dispatches update shipping when clicking previously binded buttons', async () => {
@@ -130,13 +145,13 @@ describe('AmazonPayv2ShippingStrategy', () => {
 
             expect(amazonPayv2PaymentProcessor.createButton).not.toHaveBeenCalled();
             expect(amazonPayv2PaymentProcessor.initialize).toHaveBeenCalledWith(paymentMethodMock.id);
-            expect(amazonPayv2PaymentProcessor.bindButton).toHaveBeenCalledWith(`#${shippingId}`, paymentToken);
+            expect(amazonPayv2PaymentProcessor.bindButton).toHaveBeenCalledWith(shippingId, paymentToken, 'changeAddress');
         });
 
         it('does not initialize the paymentProcessor if no options.methodId are provided', () => {
             initializeOptions.methodId = '';
 
-            expect(strategy.initialize(initializeOptions)).rejects.toThrow(MissingDataError);
+            expect(strategy.initialize(initializeOptions)).rejects.toThrow(InvalidArgumentError);
             expect(amazonPayv2PaymentProcessor.initialize).not.toHaveBeenCalled();
         });
 
@@ -162,27 +177,36 @@ describe('AmazonPayv2ShippingStrategy', () => {
         });
     });
 
-    describe('#selectOption()', () => {
-        it('does not finalize order if order is not created', async () => {
-            await strategy.selectOption();
+    it('selects shipping option', async () => {
+        const method = getFlatRateOption();
+        const options = {};
+        const action = of(createAction(ConsignmentActionType.UpdateConsignmentRequested));
 
-            expect(await strategy.deinitialize()).toEqual(store.getState());
-        });
+        jest.spyOn(consignmentActionCreator, 'selectShippingOption')
+            .mockReturnValue(action);
+
+        jest.spyOn(store, 'dispatch');
+
+        const output = await strategy.selectOption(method.id, options);
+
+        expect(consignmentActionCreator.selectShippingOption).toHaveBeenCalledWith(method.id, options);
+        expect(store.dispatch).toHaveBeenCalledWith(action);
+        expect(output).toEqual(store.getState());
     });
 
-    describe('#updateAddress()', () => {
-        it('does not finalize order if order is not created', async () => {
-            await strategy.updateAddress();
-
-            expect(await strategy.deinitialize()).toEqual(store.getState());
-        });
-    });
+    it('updates shipping address', () => expect(strategy.updateAddress()).resolves.toEqual(store.getState()));
 
     describe('#deinitialize()', () => {
         let initializeOptions: ShippingInitializeOptions;
+        const shippingId = 'edit-ship-address-button';
 
         beforeEach(async () => {
-            initializeOptions = { methodId: 'amazonpay' };
+            initializeOptions = {
+                methodId: 'amazonpay',
+                amazonpay: {
+                    walletButton: shippingId,
+                },
+            };
             await strategy.initialize(initializeOptions);
         });
 

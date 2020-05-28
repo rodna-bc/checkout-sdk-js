@@ -1,10 +1,11 @@
 import { createAction } from '@bigcommerce/data-store';
 
+import { ConsignmentActionCreator } from '../..';
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
-import { MissingDataError, MissingDataErrorType } from '../../../common/error/errors';
+import { InvalidArgumentError, MissingDataError, MissingDataErrorType } from '../../../common/error/errors';
 import { PaymentMethod, PaymentMethodActionCreator } from '../../../payment';
-import { AmazonPayv2PaymentProcessor } from '../../../payment/strategies/amazon-payv2';
-import { ShippingInitializeOptions } from '../../shipping-request-options';
+import { AmazonPayv2PaymentProcessor, AmazonPayV2ChangeActionType } from '../../../payment/strategies/amazon-payv2';
+import { ShippingInitializeOptions, ShippingRequestOptions } from '../../shipping-request-options';
 import { ShippingStrategyActionType } from '../../shipping-strategy-actions';
 import ShippingStrategy from '../shipping-strategy';
 
@@ -13,6 +14,7 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
 
     constructor(
         private _store: CheckoutStore,
+        private _consignmentActionCreator: ConsignmentActionCreator,
         private _paymentMethodActionCreator: PaymentMethodActionCreator,
         private _amazonPayv2PaymentProcessor: AmazonPayv2PaymentProcessor
     ) {}
@@ -21,15 +23,17 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
         return Promise.resolve(this._store.getState());
     }
 
-    selectOption(): Promise<InternalCheckoutSelectors> {
-        return Promise.resolve(this._store.getState());
+    selectOption(optionId: string, options?: ShippingRequestOptions): Promise<InternalCheckoutSelectors> {
+        return this._store.dispatch(
+            this._consignmentActionCreator.selectShippingOption(optionId, options)
+        );
     }
 
     async initialize(options: ShippingInitializeOptions): Promise<InternalCheckoutSelectors> {
-        const { methodId } = options;
+        const { amazonpay, methodId } = options;
 
-        if (!methodId) {
-            throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
+        if (!amazonpay || !methodId) {
+            throw new InvalidArgumentError('Unable to proceed because "options.amazonpay" argument is not provided.');
         }
 
         const state = await this._store.dispatch(this._paymentMethodActionCreator.loadPaymentMethod(methodId));
@@ -42,9 +46,10 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
         await this._amazonPayv2PaymentProcessor.initialize(methodId);
 
         const { paymentToken } = this._paymentMethod.initializationData;
+        const buttonId = amazonpay.walletButton;
 
-        if (paymentToken) {
-            this._bindEditButton('ship', paymentToken);
+        if (paymentToken && buttonId) {
+            this._bindEditButton(buttonId, paymentToken, 'changeAddress');
         }
 
         return this._store.getState();
@@ -56,9 +61,8 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
         return Promise.resolve(this._store.getState());
     }
 
-    private _bindEditButton(type: string, sessionId: string): void {
-        const id = `#edit-${type}-address-button`;
-        const button = document.querySelector(id);
+    private _bindEditButton(id: string, sessionId: string, changeAction: AmazonPayV2ChangeActionType): void {
+        const button = document.getElementById(id);
 
         if (!button) {
             return;
@@ -69,7 +73,7 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
 
         clone.addEventListener('click', () => this._showLoadingSpinner());
 
-        this._amazonPayv2PaymentProcessor.bindButton(id, sessionId);
+        this._amazonPayv2PaymentProcessor.bindButton(id, sessionId, changeAction);
     }
 
     private _showLoadingSpinner(): Promise<InternalCheckoutSelectors> {

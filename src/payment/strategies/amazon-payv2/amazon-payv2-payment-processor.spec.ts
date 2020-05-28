@@ -110,18 +110,18 @@ describe('AmazonPayv2PaymentProcessor', () => {
         it('bind the button successfully', async () => {
             const bindOptions = {
                 amazonCheckoutSessionId: sessionId,
-                changeAction: 'changeAddress',
+                changeAction: 'changePayment',
             };
 
             await processor.initialize('amazonMaxo');
 
-            processor.bindButton(buttonName, sessionId);
+            processor.bindButton(buttonName, sessionId, 'changePayment');
 
-            expect(clientMock.bindChangeAction).toHaveBeenCalledWith(buttonName, bindOptions);
+            expect(clientMock.bindChangeAction).toHaveBeenCalledWith(`#${buttonName}`, bindOptions);
         });
 
         it('does not bind the button if the processor is not initialized previously', () => {
-            expect(() => processor.bindButton(buttonName, sessionId)).toThrow(NotInitializedError);
+            expect(() => processor.bindButton(buttonName, sessionId, 'changePayment')).toThrow(NotInitializedError);
         });
     });
 
