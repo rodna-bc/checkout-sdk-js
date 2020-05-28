@@ -2,17 +2,17 @@ import { CheckoutStore } from '../../../checkout';
 import { MissingDataError, MissingDataErrorType, NotInitializedError, NotInitializedErrorType } from '../../../common/error/errors';
 import PaymentMethodActionCreator from '../../payment-method-action-creator';
 
-import { AmazonPayv2ButtonParams, AmazonPayv2SDK, AmazonPayV2ChangeActionType } from './amazon-payv2';
-import AmazonPayv2ScriptLoader from './amazon-payv2-script-loader';
+import { AmazonPayV2ButtonParams, AmazonPayV2ChangeActionType, AmazonPayV2SDK } from './amazon-pay-v2';
+import AmazonPayV2ScriptLoader from './amazon-pay-v2-script-loader';
 
-export default class AmazonPayv2PaymentProcessor {
-    private _amazonPayv2SDK?: AmazonPayv2SDK;
+export default class AmazonPayV2PaymentProcessor {
+    private _amazonPayV2SDK?: AmazonPayV2SDK;
     private _methodId?: string;
 
     constructor(
         private _store: CheckoutStore,
         private _paymentMethodActionCreator: PaymentMethodActionCreator,
-        private _amazonPayv2ScriptLoader: AmazonPayv2ScriptLoader
+        private _amazonPayV2ScriptLoader: AmazonPayV2ScriptLoader
     ) { }
 
     initialize(methodId: string): Promise<void> {
@@ -22,40 +22,40 @@ export default class AmazonPayv2PaymentProcessor {
     }
 
     deinitialize(): Promise<void> {
-        this._amazonPayv2SDK = undefined;
+        this._amazonPayV2SDK = undefined;
 
         return Promise.resolve();
     }
 
     bindButton(buttonId: string, sessionId: string, changeAction: AmazonPayV2ChangeActionType): void {
-        if (!this._amazonPayv2SDK) {
+        if (!this._amazonPayV2SDK) {
             throw new NotInitializedError(NotInitializedErrorType.PaymentNotInitialized);
         }
 
-        this._amazonPayv2SDK.Pay.bindChangeAction(`#${buttonId}`, {
+        this._amazonPayV2SDK.Pay.bindChangeAction(`#${buttonId}`, {
             amazonCheckoutSessionId: sessionId,
             changeAction,
         });
     }
 
-    createButton(containerId: string, params: AmazonPayv2ButtonParams): HTMLElement {
-        if (!this._amazonPayv2SDK) {
+    createButton(containerId: string, params: AmazonPayV2ButtonParams): HTMLElement {
+        if (!this._amazonPayV2SDK) {
             throw new NotInitializedError(NotInitializedErrorType.PaymentNotInitialized);
         }
 
-        return this._amazonPayv2SDK.Pay.renderButton(containerId, params);
+        return this._amazonPayV2SDK.Pay.renderButton(containerId, params);
     }
 
     signout(methodId: string): Promise<void> {
         this._methodId = methodId;
 
-        if (!this._amazonPayv2SDK) {
+        if (!this._amazonPayV2SDK) {
             this._configureWallet()
                 .then(() => {
                     return this.signout(methodId);
                 });
         } else {
-            this._amazonPayv2SDK.Pay.signout();
+            this._amazonPayV2SDK.Pay.signout();
         }
 
         return Promise.resolve();
@@ -70,8 +70,8 @@ export default class AmazonPayv2PaymentProcessor {
             throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
         }
 
-        const amazonPayv2Client = await this._amazonPayv2ScriptLoader.load(paymentMethod);
-        this._amazonPayv2SDK = amazonPayv2Client;
+        const amazonPayV2Client = await this._amazonPayV2ScriptLoader.load(paymentMethod);
+        this._amazonPayV2SDK = amazonPayV2Client;
     }
 
     private _getMethodId(): string {

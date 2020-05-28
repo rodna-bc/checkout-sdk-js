@@ -9,19 +9,19 @@ import { getConfigState } from '../../../config/configs.mock';
 import { getCustomerState } from '../../../customer/customers.mock';
 import PaymentMethodActionCreator from '../../payment-method-action-creator';
 import PaymentMethodRequestSender from '../../payment-method-request-sender';
-import { getAmazonPayv2, getPaymentMethodsState } from '../../payment-methods.mock';
+import { getAmazonPayV2, getPaymentMethodsState } from '../../payment-methods.mock';
 
-import { AmazonPayv2Client } from './amazon-payv2';
-import AmazonPayv2PaymentProcessor from './amazon-payv2-payment-processor';
-import AmazonPayv2ScriptLoader from './amazon-payv2-script-loader';
-import { getAmazonPayv2ButtonParamsMock, getAmazonPayv2SDKMock } from './amazon-payv2.mock';
+import { AmazonPayV2Client } from './amazon-pay-v2';
+import AmazonPayV2PaymentProcessor from './amazon-pay-v2-payment-processor';
+import AmazonPayV2ScriptLoader from './amazon-pay-v2-script-loader';
+import { getAmazonPayV2ButtonParamsMock, getAmazonPayV2SDKMock } from './amazon-pay-v2.mock';
 
-describe('AmazonPayv2PaymentProcessor', () => {
-    let processor: AmazonPayv2PaymentProcessor;
+describe('AmazonPayV2PaymentProcessor', () => {
+    let processor: AmazonPayV2PaymentProcessor;
     let paymentMethodActionCreator: PaymentMethodActionCreator;
-    let amazonPayv2ScriptLoader: AmazonPayv2ScriptLoader;
+    let amazonPayV2ScriptLoader: AmazonPayV2ScriptLoader;
     let store: CheckoutStore;
-    let clientMock: AmazonPayv2Client;
+    let clientMock: AmazonPayV2Client;
     let requestSender: RequestSender;
 
     beforeEach(() => {
@@ -35,41 +35,41 @@ describe('AmazonPayv2PaymentProcessor', () => {
             paymentMethods: getPaymentMethodsState(),
         });
         paymentMethodActionCreator = new PaymentMethodActionCreator(new PaymentMethodRequestSender(requestSender));
-        amazonPayv2ScriptLoader = new AmazonPayv2ScriptLoader(scriptLoader);
+        amazonPayV2ScriptLoader = new AmazonPayV2ScriptLoader(scriptLoader);
         requestSender = createRequestSender();
 
-        processor =  new AmazonPayv2PaymentProcessor(
+        processor =  new AmazonPayV2PaymentProcessor(
             store,
             paymentMethodActionCreator,
-            amazonPayv2ScriptLoader
+            amazonPayV2ScriptLoader
         );
     });
 
     describe('#initialize', () => {
         beforeEach(() => {
-            const amazonPayv2SDK = getAmazonPayv2SDKMock();
+            const amazonPayV2SDK = getAmazonPayV2SDKMock();
             clientMock = {
                 renderButton: jest.fn(() => Promise.resolve(new HTMLElement())),
                 bindChangeAction: () => null,
                 signout: () => null,
             };
-            amazonPayv2SDK.Pay.renderButton = jest.fn(() => clientMock);
+            amazonPayV2SDK.Pay.renderButton = jest.fn(() => clientMock);
 
-            jest.spyOn(amazonPayv2ScriptLoader, 'load').mockReturnValue(Promise.resolve(amazonPayv2SDK));
+            jest.spyOn(amazonPayV2ScriptLoader, 'load').mockReturnValue(Promise.resolve(amazonPayV2SDK));
         });
 
-        it('creates an instance of AmazonPayv2PaymentProcessor', () => {
-            expect(processor).toBeInstanceOf(AmazonPayv2PaymentProcessor);
+        it('creates an instance of AmazonPayV2PaymentProcessor', () => {
+            expect(processor).toBeInstanceOf(AmazonPayV2PaymentProcessor);
         });
 
         it('initializes processor successfully', async () => {
             jest.spyOn(store, 'dispatch').mockReturnValue(Promise.resolve(store.getState()));
-            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getAmazonPayv2());
+            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getAmazonPayV2());
             jest.spyOn(paymentMethodActionCreator, 'loadPaymentMethod').mockReturnValue(Promise.resolve(store.getState()));
 
             await processor.initialize('amazonpay');
 
-            expect(amazonPayv2ScriptLoader.load).toHaveBeenCalled();
+            expect(amazonPayV2ScriptLoader.load).toHaveBeenCalled();
         });
 
         it('fails to initialize processor without paymentMethod', async () => {
@@ -92,18 +92,18 @@ describe('AmazonPayv2PaymentProcessor', () => {
         const buttonName = 'bindableButton';
 
         beforeEach(() => {
-            const amazonPayv2SDK = getAmazonPayv2SDKMock();
+            const amazonPayV2SDK = getAmazonPayV2SDKMock();
             clientMock = {
                 renderButton: (jest.fn(() => Promise.resolve())),
                 bindChangeAction: jest.fn(),
                 signout: () => null,
             };
 
-            amazonPayv2SDK.Pay = clientMock;
+            amazonPayV2SDK.Pay = clientMock;
 
-            jest.spyOn(amazonPayv2ScriptLoader, 'load').mockReturnValue(Promise.resolve(amazonPayv2SDK));
+            jest.spyOn(amazonPayV2ScriptLoader, 'load').mockReturnValue(Promise.resolve(amazonPayV2SDK));
             jest.spyOn(store, 'dispatch').mockReturnValue(Promise.resolve(store.getState()));
-            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getAmazonPayv2());
+            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getAmazonPayV2());
             jest.spyOn(paymentMethodActionCreator, 'loadPaymentMethod').mockReturnValue(Promise.resolve(store.getState()));
         });
 
@@ -129,7 +129,7 @@ describe('AmazonPayv2PaymentProcessor', () => {
         const methodId = 'amazonmaxo';
 
         beforeEach(() => {
-            const amazonMaxoSDK = getAmazonPayv2SDKMock();
+            const amazonMaxoSDK = getAmazonPayV2SDKMock();
             clientMock = {
                 renderButton: (jest.fn(() => Promise.resolve())),
                 bindChangeAction: jest.fn(),
@@ -138,16 +138,16 @@ describe('AmazonPayv2PaymentProcessor', () => {
 
             amazonMaxoSDK.Pay = clientMock;
 
-            jest.spyOn(amazonPayv2ScriptLoader, 'load').mockReturnValue(Promise.resolve(amazonMaxoSDK));
+            jest.spyOn(amazonPayV2ScriptLoader, 'load').mockReturnValue(Promise.resolve(amazonMaxoSDK));
             jest.spyOn(store, 'dispatch').mockReturnValue(Promise.resolve(store.getState()));
-            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getAmazonPayv2());
+            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getAmazonPayV2());
             jest.spyOn(paymentMethodActionCreator, 'loadPaymentMethod').mockReturnValue(Promise.resolve(store.getState()));
         });
 
         it('loads the SDK when the SDK is not loaded', async () => {
             await processor.signout(methodId);
 
-            expect(amazonPayv2ScriptLoader.load).toHaveBeenCalled();
+            expect(amazonPayV2ScriptLoader.load).toHaveBeenCalled();
         });
 
         it('signouts succesfully when the SDK is previouly loaded', async () => {
@@ -161,31 +161,31 @@ describe('AmazonPayv2PaymentProcessor', () => {
 
     describe('#createButton', () => {
         beforeEach(() => {
-            const amazonPayv2SDK = getAmazonPayv2SDKMock();
+            const amazonPayV2SDK = getAmazonPayV2SDKMock();
             clientMock = {
                 renderButton: jest.fn(() => Promise.resolve()),
                 bindChangeAction: () => null,
                 signout: () => null,
             };
 
-            amazonPayv2SDK.Pay = clientMock;
+            amazonPayV2SDK.Pay = clientMock;
 
-            jest.spyOn(amazonPayv2ScriptLoader, 'load').mockReturnValue(Promise.resolve(amazonPayv2SDK));
+            jest.spyOn(amazonPayV2ScriptLoader, 'load').mockReturnValue(Promise.resolve(amazonPayV2SDK));
             jest.spyOn(store, 'dispatch').mockReturnValue(Promise.resolve(store.getState()));
-            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getAmazonPayv2());
+            jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getAmazonPayV2());
             jest.spyOn(paymentMethodActionCreator, 'loadPaymentMethod').mockReturnValue(Promise.resolve(store.getState()));
         });
 
         it('creates the html button element', async () => {
             await processor.initialize('amazonpay');
-            await processor.createButton('container', getAmazonPayv2ButtonParamsMock());
+            await processor.createButton('container', getAmazonPayV2ButtonParamsMock());
 
             expect(clientMock.renderButton).toHaveBeenCalled();
         });
 
-        it('throws an error when amazonPayv2SDK is not initialized', async () => {
+        it('throws an error when amazonPayV2SDK is not initialized', async () => {
 
-            await expect(() => {processor.createButton('container', getAmazonPayv2ButtonParamsMock()); } ).toThrow(NotInitializedError);
+            await expect(() => {processor.createButton('container', getAmazonPayV2ButtonParamsMock()); } ).toThrow(NotInitializedError);
         });
     });
 });

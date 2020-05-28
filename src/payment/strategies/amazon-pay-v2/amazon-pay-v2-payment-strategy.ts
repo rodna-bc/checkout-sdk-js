@@ -4,7 +4,6 @@ import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
 import { InvalidArgumentError, MissingDataError, MissingDataErrorType, NotInitializedError, NotInitializedErrorType, RequestError } from '../../../common/error/errors';
 import { OrderActionCreator, OrderRequestBody } from '../../../order';
 import { OrderFinalizationNotRequiredError } from '../../../order/errors';
-import { AmazonPayv2PaymentProcessor, AmazonPayv2PayOptions, AmazonPayv2Placement, AmazonPayV2ChangeActionType } from '../../../payment/strategies/amazon-payv2';
 import { PaymentArgumentInvalidError } from '../../errors';
 import PaymentActionCreator from '../../payment-action-creator';
 import PaymentMethod from '../../payment-method';
@@ -13,7 +12,9 @@ import { PaymentInitializeOptions, PaymentRequestOptions } from '../../payment-r
 import PaymentStrategyActionCreator from '../../payment-strategy-action-creator';
 import PaymentStrategy from '../payment-strategy';
 
-export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
+import { AmazonPayV2ChangeActionType, AmazonPayV2PaymentProcessor, AmazonPayV2PayOptions, AmazonPayV2Placement } from '.';
+
+export default class AmazonPayV2PaymentStrategy implements PaymentStrategy {
 
     private _walletButton?: HTMLElement;
 
@@ -23,7 +24,7 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
         private _paymentMethodActionCreator: PaymentMethodActionCreator,
         private _orderActionCreator: OrderActionCreator,
         private _paymentActionCreator: PaymentActionCreator,
-        private _amazonPayv2PaymentProcessor: AmazonPayv2PaymentProcessor
+        private _amazonPayV2PaymentProcessor: AmazonPayV2PaymentProcessor
     ) { }
 
     async initialize(options: PaymentInitializeOptions): Promise<InternalCheckoutSelectors> {
@@ -40,7 +41,7 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
             throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
         }
 
-        await this._amazonPayv2PaymentProcessor.initialize(methodId);
+        await this._amazonPayV2PaymentProcessor.initialize(methodId);
 
         const { paymentToken } = paymentMethod.initializationData;
         const buttonId = amazonpay.walletButton;
@@ -106,7 +107,7 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
             this._walletButton = undefined;
         }
 
-        await this._amazonPayv2PaymentProcessor.deinitialize();
+        await this._amazonPayV2PaymentProcessor.deinitialize();
 
         return Promise.resolve(this._store.getState());
     }
@@ -133,7 +134,7 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
 
         clone.addEventListener('click', () => this._showLoadingSpinner(() => new Promise(noop)));
 
-        this._amazonPayv2PaymentProcessor.bindButton(id, sessionId, changeAction);
+        this._amazonPayV2PaymentProcessor.bindButton(id, sessionId, changeAction);
     }
 
     private _showLoadingSpinner(callback?: () => Promise<void> | Promise<never>): Promise<InternalCheckoutSelectors> {
@@ -184,10 +185,10 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
             throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
         }
 
-        let productType = AmazonPayv2PayOptions.PayAndShip;
+        let productType = AmazonPayV2PayOptions.PayAndShip;
 
         if (cart && cart.lineItems.physicalItems.length === 0) {
-            productType = AmazonPayv2PayOptions.PayOnly;
+            productType = AmazonPayV2PayOptions.PayOnly;
         }
 
         const amazonButtonOptions = {
@@ -202,9 +203,9 @@ export default class AmazonPayv2PaymentStrategy implements PaymentStrategy {
                 url: `${config.links.siteLink}/remote-checkout/${paymentMethod.id}/payment-session`,
                 extractAmazonCheckoutSessionId,
             },
-            placement: AmazonPayv2Placement.Checkout,
+            placement: AmazonPayV2Placement.Checkout,
         };
 
-        return this._amazonPayv2PaymentProcessor.createButton(`#${containerId}`, amazonButtonOptions);
+        return this._amazonPayV2PaymentProcessor.createButton(`#${containerId}`, amazonButtonOptions);
     }
 }

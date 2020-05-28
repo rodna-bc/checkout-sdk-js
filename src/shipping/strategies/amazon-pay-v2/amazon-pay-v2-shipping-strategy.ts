@@ -4,19 +4,19 @@ import { ConsignmentActionCreator } from '../..';
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
 import { InvalidArgumentError, MissingDataError, MissingDataErrorType } from '../../../common/error/errors';
 import { PaymentMethod, PaymentMethodActionCreator } from '../../../payment';
-import { AmazonPayv2PaymentProcessor, AmazonPayV2ChangeActionType } from '../../../payment/strategies/amazon-payv2';
+import { AmazonPayV2ChangeActionType, AmazonPayV2PaymentProcessor } from '../../../payment/strategies/amazon-pay-v2';
 import { ShippingInitializeOptions, ShippingRequestOptions } from '../../shipping-request-options';
 import { ShippingStrategyActionType } from '../../shipping-strategy-actions';
 import ShippingStrategy from '../shipping-strategy';
 
-export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
+export default class AmazonPayV2ShippingStrategy implements ShippingStrategy {
     private _paymentMethod?: PaymentMethod;
 
     constructor(
         private _store: CheckoutStore,
         private _consignmentActionCreator: ConsignmentActionCreator,
         private _paymentMethodActionCreator: PaymentMethodActionCreator,
-        private _amazonPayv2PaymentProcessor: AmazonPayv2PaymentProcessor
+        private _amazonPayV2PaymentProcessor: AmazonPayV2PaymentProcessor
     ) {}
 
     updateAddress(): Promise<InternalCheckoutSelectors> {
@@ -43,7 +43,7 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
             throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
         }
 
-        await this._amazonPayv2PaymentProcessor.initialize(methodId);
+        await this._amazonPayV2PaymentProcessor.initialize(methodId);
 
         const { paymentToken } = this._paymentMethod.initializationData;
         const buttonId = amazonpay.walletButton;
@@ -56,7 +56,7 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
     }
 
     async deinitialize(): Promise<InternalCheckoutSelectors> {
-        await this._amazonPayv2PaymentProcessor.deinitialize();
+        await this._amazonPayV2PaymentProcessor.deinitialize();
 
         return Promise.resolve(this._store.getState());
     }
@@ -73,7 +73,7 @@ export default class AmazonPayv2ShippingStrategy implements ShippingStrategy {
 
         clone.addEventListener('click', () => this._showLoadingSpinner());
 
-        this._amazonPayv2PaymentProcessor.bindButton(id, sessionId, changeAction);
+        this._amazonPayV2PaymentProcessor.bindButton(id, sessionId, changeAction);
     }
 
     private _showLoadingSpinner(): Promise<InternalCheckoutSelectors> {

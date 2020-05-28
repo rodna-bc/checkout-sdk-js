@@ -1,17 +1,17 @@
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
 import { InvalidArgumentError, MissingDataError, MissingDataErrorType, NotImplementedError } from '../../../common/error/errors';
-import { AmazonPayv2PaymentProcessor, AmazonPayv2PayOptions, AmazonPayv2Placement } from '../../../payment/strategies/amazon-payv2';
+import { AmazonPayV2PaymentProcessor, AmazonPayV2PayOptions, AmazonPayV2Placement } from '../../../payment/strategies/amazon-pay-v2';
 import { RemoteCheckoutActionCreator } from '../../../remote-checkout';
 import { CustomerInitializeOptions, CustomerRequestOptions } from '../../customer-request-options';
 import CustomerStrategy from '../customer-strategy';
 
-export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
+export default class AmazonPayV2CustomerStrategy implements CustomerStrategy {
     private _walletButton?: HTMLElement;
 
     constructor(
         private _store: CheckoutStore,
         private _remoteCheckoutActionCreator: RemoteCheckoutActionCreator,
-        private _amazonPayv2PaymentProcessor: AmazonPayv2PaymentProcessor
+        private _amazonPayV2PaymentProcessor: AmazonPayV2PaymentProcessor
     ) {}
 
     async initialize(options: CustomerInitializeOptions): Promise<InternalCheckoutSelectors> {
@@ -23,7 +23,7 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
         if (!methodId) {
             throw new MissingDataError(MissingDataErrorType.MissingPaymentMethod);
         }
-        await this._amazonPayv2PaymentProcessor.initialize(methodId);
+        await this._amazonPayV2PaymentProcessor.initialize(methodId);
         this._walletButton = this._createSignInButton(amazonpay.container, methodId);
 
         return this._store.getState();
@@ -52,7 +52,7 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
             return Promise.resolve(this._store.getState());
         }
 
-        await this._amazonPayv2PaymentProcessor.signout(payment.providerId);
+        await this._amazonPayV2PaymentProcessor.signout(payment.providerId);
 
         return this._store.dispatch(
             this._remoteCheckoutActionCreator.signOut(payment.providerId, options)
@@ -104,16 +104,16 @@ export default class AmazonPayv2CustomerStrategy implements CustomerStrategy {
             ledgerCurrency,
             region,
             productType: cart && cart.lineItems.physicalItems.length === 0 ?
-                AmazonPayv2PayOptions.PayOnly :
-                AmazonPayv2PayOptions.PayAndShip,
+                AmazonPayV2PayOptions.PayOnly :
+                AmazonPayV2PayOptions.PayAndShip,
             createCheckoutSession: {
                 method: checkoutSessionMethod,
                 url: `${config.storeProfile.shopPath}/remote-checkout/${methodId}/payment-session`,
                 extractAmazonCheckoutSessionId,
             },
-            placement: AmazonPayv2Placement.Checkout,
+            placement: AmazonPayV2Placement.Checkout,
         };
 
-        return this._amazonPayv2PaymentProcessor.createButton(`#${containerId}`, amazonButtonOptions);
+        return this._amazonPayV2PaymentProcessor.createButton(`#${containerId}`, amazonButtonOptions);
     }
 }

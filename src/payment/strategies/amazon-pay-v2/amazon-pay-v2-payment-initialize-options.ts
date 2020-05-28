@@ -1,4 +1,4 @@
-export default interface AmazonPayv2PaymentInitializeOptions {
+export default interface AmazonPayV2PaymentInitializeOptions {
     /**
      * The location to insert the Amazon Pay component.
      */

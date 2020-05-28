@@ -6,22 +6,22 @@ import { getCheckoutState } from '../../../checkout/checkouts.mock';
 import { InvalidArgumentError, MissingDataError } from '../../../common/error/errors';
 import { getConfigState } from '../../../config/configs.mock';
 import { PaymentMethod } from '../../../payment';
-import { getAmazonPayv2, getPaymentMethodsState } from '../../../payment/payment-methods.mock';
-import { createAmazonPayv2PaymentProcessor, AmazonPayv2PaymentProcessor } from '../../../payment/strategies/amazon-payv2';
-import { getPaymentMethodMockUndefinedMerchant } from '../../../payment/strategies/amazon-payv2/amazon-payv2.mock';
+import { getAmazonPayV2, getPaymentMethodsState } from '../../../payment/payment-methods.mock';
+import { createAmazonPayV2PaymentProcessor, AmazonPayV2PaymentProcessor } from '../../../payment/strategies/amazon-pay-v2';
+import { getPaymentMethodMockUndefinedMerchant } from '../../../payment/strategies/amazon-pay-v2/amazon-pay-v2.mock';
 import { RemoteCheckoutActionCreator, RemoteCheckoutRequestSender } from '../../../remote-checkout';
 import { CustomerInitializeOptions } from '../../customer-request-options';
 import { getCustomerState } from '../../customers.mock';
 import CustomerStrategy from '../customer-strategy';
 
-import AmazonPayv2CustomerStrategy from './amazon-payv2-customer-strategy';
-import { getAmazonPayv2CustomerInitializeOptions, Mode } from './amazon-payv2-customer.mock';
+import AmazonPayV2CustomerStrategy from './amazon-pay-v2-customer-strategy';
+import { getAmazonPayV2CustomerInitializeOptions, Mode } from './amazon-pay-v2-customer.mock';
 
-describe('AmazonPayv2CustomerStrategy', () => {
+describe('AmazonPayV2CustomerStrategy', () => {
     let container: HTMLDivElement;
     let customerInitializeOptions: CustomerInitializeOptions;
     let paymentMethod: PaymentMethod;
-    let paymentProcessor: AmazonPayv2PaymentProcessor;
+    let paymentProcessor: AmazonPayV2PaymentProcessor;
     let remoteCheckoutActionCreator: RemoteCheckoutActionCreator;
     let requestSender: RequestSender;
     let store: CheckoutStore;
@@ -29,7 +29,7 @@ describe('AmazonPayv2CustomerStrategy', () => {
     let walletButton: HTMLAnchorElement;
 
     beforeEach(() => {
-        paymentMethod = getAmazonPayv2();
+        paymentMethod = getAmazonPayV2();
 
         store = createCheckoutStore({
             checkout: getCheckoutState(),
@@ -45,9 +45,9 @@ describe('AmazonPayv2CustomerStrategy', () => {
             new RemoteCheckoutRequestSender(requestSender)
         );
 
-        paymentProcessor = createAmazonPayv2PaymentProcessor(store);
+        paymentProcessor = createAmazonPayV2PaymentProcessor(store);
 
-        strategy = new AmazonPayv2CustomerStrategy(
+        strategy = new AmazonPayV2CustomerStrategy(
             store,
             remoteCheckoutActionCreator,
             paymentProcessor
@@ -84,7 +84,7 @@ describe('AmazonPayv2CustomerStrategy', () => {
     describe('#initialize()', () => {
 
         it('creates the button', async () => {
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions();
 
             await strategy.initialize(customerInitializeOptions);
 
@@ -92,7 +92,7 @@ describe('AmazonPayv2CustomerStrategy', () => {
         });
 
         it('creates the button and validates if cart contains physical items', async () => {
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions();
             jest.spyOn(store.getState().cart, 'getCart')
                 .mockReturnValue({...store.getState().cart.getCart(), lineItems: {physicalItems: []}});
 
@@ -101,41 +101,41 @@ describe('AmazonPayv2CustomerStrategy', () => {
             expect(paymentProcessor.createButton).toHaveBeenCalled();
         });
 
-        it('fails to initialize the strategy if no AmazonPayv2CustomerInitializeOptions is provided ', async () => {
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions(Mode.Incomplete);
+        it('fails to initialize the strategy if no AmazonPayV2CustomerInitializeOptions is provided ', async () => {
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions(Mode.Incomplete);
 
             await expect(strategy.initialize(customerInitializeOptions)).rejects.toThrow(InvalidArgumentError);
         });
 
         it('fails to initialize the strategy if no methodid is supplied', async () => {
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions(Mode.UndefinedMethodId);
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions(Mode.UndefinedMethodId);
 
             await expect(strategy.initialize(customerInitializeOptions)).rejects.toThrow(MissingDataError);
         });
 
         it('fails to create button if method is not assigned', async () => {
             jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(undefined);
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions();
 
             await expect(strategy.initialize(customerInitializeOptions)).rejects.toThrow(MissingDataError);
         });
 
         it('fails to create button if config is not initialized', async () => {
             jest.spyOn(store.getState().config, 'getStoreConfig').mockReturnValue(undefined);
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions();
 
             await expect(strategy.initialize(customerInitializeOptions)).rejects.toThrow(MissingDataError);
         });
 
         it('fails to create button if merchantId is not supplied', async () => {
             jest.spyOn(store.getState().paymentMethods, 'getPaymentMethod').mockReturnValue(getPaymentMethodMockUndefinedMerchant());
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions();
 
             await expect(strategy.initialize(customerInitializeOptions)).rejects.toThrow(InvalidArgumentError);
         });
 
         it('fails to initialize the strategy if no valid container id is supplied', async () => {
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions(Mode.InvalidContainer);
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions(Mode.InvalidContainer);
 
             await expect(strategy.initialize(customerInitializeOptions)).rejects.toThrow(InvalidArgumentError);
         });
@@ -145,7 +145,7 @@ describe('AmazonPayv2CustomerStrategy', () => {
         let customerInitializeOptions: CustomerInitializeOptions;
 
         beforeEach(() => {
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions();
         });
 
         it('succesfully deinitializes the strategy', async () => {
@@ -172,7 +172,7 @@ describe('AmazonPayv2CustomerStrategy', () => {
 
     describe('#signIn()', () => {
         it('throws error if trying to sign in programmatically', async () => {
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions();
 
             await strategy.initialize(customerInitializeOptions);
 
@@ -182,7 +182,7 @@ describe('AmazonPayv2CustomerStrategy', () => {
 
     describe('#signOut()', () => {
         beforeEach(async () => {
-            customerInitializeOptions = getAmazonPayv2CustomerInitializeOptions();
+            customerInitializeOptions = getAmazonPayV2CustomerInitializeOptions();
 
             await strategy.initialize(customerInitializeOptions);
         });
