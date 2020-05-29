@@ -1,4 +1,4 @@
-import { noop, some } from 'lodash';
+import { noop } from 'lodash';
 
 import { CheckoutStore, InternalCheckoutSelectors } from '../../../checkout';
 import { InvalidArgumentError, MissingDataError, MissingDataErrorType, NotInitializedError, NotInitializedErrorType, RequestError } from '../../../common/error/errors';
@@ -84,13 +84,13 @@ export default class AmazonPayV2PaymentStrategy implements PaymentStrategy {
             try {
                 return await this._store.dispatch(this._paymentActionCreator.submitPayment(paymentPayload));
             } catch (error) {
-                if (!(error instanceof RequestError) || !some(error.body.errors, { code: 'additional_action_required' })) {
-                    throw error;
+                if (error instanceof RequestError && error.body.status === 'additional_action_required') {
+                    return new Promise(() => {
+                        window.location.replace(error.body.additional_action_required.data.redirect_url);
+                    });
                 }
 
-                return new Promise(() => {
-                    window.location.replace(error.body.provider_data.redirect_url);
-                });
+                throw error;
             }
         }
 

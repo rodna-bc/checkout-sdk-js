@@ -347,13 +347,13 @@ describe('AmazonPayV2PaymentStrategy', () => {
         it('redirects to Amazon url', async () => {
             const error = new RequestError(getResponse({
                 ...getErrorPaymentResponseBody(),
-                errors: [
-                    { code: 'additional_action_required' },
-                ],
-                provider_data: {
-                    redirect_url: 'http://some-url',
-                },
-                status: 'error',
+                status: 'additional_action_required',
+                additional_action_required: {
+                    type: 'external_redirect',
+                    data: {
+                        redirect_url: 'http://some-url',
+                    },
+                } ,
             }));
             window.location.replace = jest.fn();
 
