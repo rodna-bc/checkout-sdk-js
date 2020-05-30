@@ -14,6 +14,7 @@ import { CustomerInitializeOptions } from '../../customer-request-options';
 import { getCustomerState } from '../../customers.mock';
 import CustomerStrategy from '../customer-strategy';
 
+import { AmazonPayV2CustomerInitializeOptions } from '.';
 import AmazonPayV2CustomerStrategy from './amazon-pay-v2-customer-strategy';
 import { getAmazonPayV2CustomerInitializeOptions, Mode } from './amazon-pay-v2-customer.mock';
 
@@ -149,24 +150,15 @@ describe('AmazonPayV2CustomerStrategy', () => {
         });
 
         it('succesfully deinitializes the strategy', async () => {
-            await strategy.initialize(customerInitializeOptions);
-            strategy.deinitialize();
-            if (customerInitializeOptions.amazonpay) {
-                // tslint:disable-next-line:no-non-null-assertion
-                const button = document.getElementById(customerInitializeOptions.amazonpay!.container);
-                // tslint:disable-next-line:no-non-null-assertion
-                expect(button!.firstChild).toBe(null);
-            }
-        });
+            const amazonInitializeOptions = customerInitializeOptions.amazonpay as AmazonPayV2CustomerInitializeOptions;
 
-        it('run deinitializes without calling initialize', () => {
-            strategy.deinitialize();
-            if (customerInitializeOptions.amazonpay) {
-                // tslint:disable-next-line:no-non-null-assertion
-                const button = document.getElementById(customerInitializeOptions.amazonpay!.container);
-                // tslint:disable-next-line:no-non-null-assertion
-                expect(button!.firstChild).not.toBe(null);
-            }
+            await strategy.initialize(customerInitializeOptions);
+            expect(document.getElementById(amazonInitializeOptions.container)).not.toBeNull();
+
+            await strategy.deinitialize();
+            expect(document.getElementById(amazonInitializeOptions.container)).toBeNull();
+
+            document.body.appendChild(container);
         });
     });
 

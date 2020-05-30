@@ -60,7 +60,7 @@ export default class AmazonPayV2CustomerStrategy implements CustomerStrategy {
     }
 
     private _createSignInButton(containerId: string, methodId: string): HTMLElement {
-        const container = document.querySelector(`#${containerId}`);
+        const container = document.getElementById(containerId);
 
         if (!container) {
             throw new InvalidArgumentError('Unable to create sign-in button without valid container ID.');
@@ -114,6 +114,8 @@ export default class AmazonPayV2CustomerStrategy implements CustomerStrategy {
             placement: AmazonPayV2Placement.Checkout,
         };
 
-        return this._amazonPayV2PaymentProcessor.createButton(`#${containerId}`, amazonButtonOptions);
+        this._amazonPayV2PaymentProcessor.createButton(`#${containerId}`, amazonButtonOptions);
+
+        return container;
     }
 }

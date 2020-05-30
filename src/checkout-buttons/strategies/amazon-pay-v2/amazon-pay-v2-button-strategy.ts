@@ -14,13 +14,16 @@ export default class AmazonPayV2ButtonStrategy implements CheckoutButtonStrategy
     ) { }
 
     async initialize(options: CheckoutButtonInitializeOptions): Promise<void> {
-            const { containerId, methodId } = options;
-            if (!containerId) {
-                throw new InvalidArgumentError('Unable to proceed because "containerId" argument is not provided.');
-            }
-            await this._store.dispatch(this._checkoutActionCreator.loadDefaultCheckout());
-            await this._amazonPayV2PaymentProcessor.initialize(methodId);
-            this._walletButton = this._createSignInButton(containerId, methodId);
+        const { containerId, methodId } = options;
+
+        if (!containerId || !methodId) {
+            throw new InvalidArgumentError('Unable to proceed because "containerId" argument is not provided.');
+        }
+
+        await this._store.dispatch(this._checkoutActionCreator.loadDefaultCheckout());
+        await this._amazonPayV2PaymentProcessor.initialize(methodId);
+
+        this._walletButton = this._createSignInButton(containerId, methodId);
     }
 
     deinitialize(): Promise<void> {
@@ -33,7 +36,7 @@ export default class AmazonPayV2ButtonStrategy implements CheckoutButtonStrategy
     }
 
     private _createSignInButton(containerId: string, methodId: string): HTMLElement {
-        const container = document.querySelector(`#${containerId}`);
+        const container = document.getElementById(containerId);
 
         if (!container) {
             throw new InvalidArgumentError('Unable to create sign-in button without valid container ID.');
@@ -87,6 +90,8 @@ export default class AmazonPayV2ButtonStrategy implements CheckoutButtonStrategy
             placement: AmazonPayV2Placement.Cart,
         };
 
-        return this._amazonPayV2PaymentProcessor.createButton(`#${containerId}`, amazonButtonOptions);
+        this._amazonPayV2PaymentProcessor.createButton(`#${containerId}`, amazonButtonOptions);
+
+        return container;
     }
 }

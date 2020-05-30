@@ -185,9 +185,7 @@ describe('AmazonPayV2ButtonStrategy', () => {
             await strategy.deinitialize();
             const button = document.getElementById(checkoutButtonOptions.containerId);
 
-            if (button) {
-                expect(button.firstChild).toBe(null);
-            }
+            expect(button).toBe(null);
         });
 
         it('run deinitializes without calling initialize', async () => {
