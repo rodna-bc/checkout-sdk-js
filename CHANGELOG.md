@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.72.3-alpha.cc2431725b6f8d29046eea36c6ec5f427cb972bd](https://github.com/bigcommerce/checkout-sdk-js/compare/v1.72.2...v1.72.3-alpha.cc2431725b6f8d29046eea36c6ec5f427cb972bd) (2020-05-31)
+
+
+### Bug Fixes
+
+* **payment:** INT-2119 walletButton was undefined ([cc24317](https://github.com/bigcommerce/checkout-sdk-js/commit/cc24317))
+
+
+### Code Refactoring
+
+* **payment:** INT-2119 rename to Amazon Pay V2 ([b4eba13](https://github.com/bigcommerce/checkout-sdk-js/commit/b4eba13))
+* **payment:** INT-2464 rename the method id from amazonmaxo to amazonpay ([60c9359](https://github.com/bigcommerce/checkout-sdk-js/commit/60c9359))
+* **payment:** INT-2464 rename to amazon pay v2 ([362ba77](https://github.com/bigcommerce/checkout-sdk-js/commit/362ba77))
+
+
+### Features
+
+* **payment:** INT-2113 Checkout button and customer strategy ([923fe5c](https://github.com/bigcommerce/checkout-sdk-js/commit/923fe5c))
+* **payment:** INT-2119 adding payment and shipping strategies ([3864b68](https://github.com/bigcommerce/checkout-sdk-js/commit/3864b68))
+* **payment:** INT-2119 avoid binding of billing address ([b33431c](https://github.com/bigcommerce/checkout-sdk-js/commit/b33431c))
+* **payment:** INT-2119 avoid reloading from SDK ([43f9258](https://github.com/bigcommerce/checkout-sdk-js/commit/43f9258))
+* **payment:** INT-2119 Catch additional_action_required status ([5b28de9](https://github.com/bigcommerce/checkout-sdk-js/commit/5b28de9))
+* **payment:** INT-2119 fix linter issue ([9966888](https://github.com/bigcommerce/checkout-sdk-js/commit/9966888))
+* **payment:** INT-2119 remove shipping binding ([651696c](https://github.com/bigcommerce/checkout-sdk-js/commit/651696c))
+* **payment:** INT-2119 sending methodId in order creation ([e5ba553](https://github.com/bigcommerce/checkout-sdk-js/commit/e5ba553))
+* **payment:** INT-2119 suggested changes ([9b38641](https://github.com/bigcommerce/checkout-sdk-js/commit/9b38641))
+* **payment:** INT-2119 suggested changes 2 ([362c727](https://github.com/bigcommerce/checkout-sdk-js/commit/362c727))
+* **payment:** INT-2119 suggested changes by Sydney ([3ff2c88](https://github.com/bigcommerce/checkout-sdk-js/commit/3ff2c88))
+* **payment:** INT-2464 fix linter issue ([2f203db](https://github.com/bigcommerce/checkout-sdk-js/commit/2f203db))
+
 ### [1.72.2](https://github.com/bigcommerce/checkout-sdk-js/compare/v1.72.1...v1.72.2) (2020-05-26)
 
 

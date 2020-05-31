@@ -24,6 +24,52 @@ declare interface AddressRequestBody {
     }>;
 }
 
+declare interface AmazonPayV2ButtonInitializeOptions {
+    containerId: string;
+    options: AmazonPayV2ButtonParams;
+}
+
+declare interface AmazonPayV2ButtonParams {
+    merchantId: string;
+    createCheckoutSession: AmazonPayV2CheckoutSession;
+    placement: AmazonPayV2Placement;
+    ledgerCurrency: AmazonPayV2LedgerCurrency;
+    productType?: string;
+    checkoutLanguage?: AmazonPayV2CheckoutLanguage;
+    sandbox?: boolean;
+}
+
+declare enum AmazonPayV2CheckoutLanguage {
+    es_ES = "es_ES",
+    en_GB = "en_GB",
+    en_US = "en_US",
+    de_DE = "de_DE",
+    fr_FR = "fr_FR",
+    it_IT = "it_IT",
+    ja_JP = "ja_JP"
+}
+
+declare interface AmazonPayV2CheckoutSession {
+    url: string;
+    method?: string;
+    extractAmazonCheckoutSessionId?: string;
+}
+
+declare enum AmazonPayV2LedgerCurrency {
+    eu = "EUR",
+    jp = "JPY",
+    uk = "GBP",
+    us = "USD"
+}
+
+declare enum AmazonPayV2Placement {
+    Home = "Home",
+    Product = "Product",
+    Cart = "Cart",
+    Checkout = "Checkout",
+    Other = "Other"
+}
+
 declare interface BraintreeError extends Error {
     type: 'CUSTOMER' | 'MERCHANT' | 'NETWORK' | 'INTERNAL' | 'UNKNOWN';
     code: string;
@@ -77,6 +123,11 @@ declare class CheckoutButtonErrorSelector {
 }
 
 declare interface CheckoutButtonInitializeOptions extends CheckoutButtonOptions {
+    /**
+     * The options that are required to facilitate Amazon Pay v2. They can be
+     * omitted unless you need to support Amazon Pay v2.
+     */
+    amazonpay?: AmazonPayV2ButtonInitializeOptions;
     /**
      * The options that are required to facilitate Braintree PayPal. They can be
      * omitted unless you need to support Braintree PayPal.
@@ -203,6 +254,7 @@ declare interface CheckoutButtonInitializerOptions {
 }
 
 declare enum CheckoutButtonMethodType {
+    AMAZON_PAY_V2 = "amazonpay",
     BRAINTREE_PAYPAL = "braintreepaypal",
     BRAINTREE_PAYPAL_CREDIT = "braintreepaypalcredit",
     GOOGLEPAY_ADYENV2 = "googlepayadyenv2",
